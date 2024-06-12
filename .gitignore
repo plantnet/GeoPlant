@@ -1,0 +1,10 @@
+*.idea/
+
+data
+metadata
+resources
+ecodatacube-extraction/patches_rgbi_glc
+
+*.csv
+
+.DS_Store

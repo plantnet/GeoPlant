@@ -1,0 +1,4 @@
+geopandas
+tqdm
+reverse_geocoder
+swifter
