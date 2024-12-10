@@ -4,6 +4,7 @@ data
 metadata
 resources
 ecodatacube-extraction/patches_rgbi_glc
+__pycache__/
 
 *.csv
 

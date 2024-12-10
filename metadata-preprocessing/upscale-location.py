@@ -104,7 +104,7 @@ def main(input_file, output_file):
 
 if __name__ == "__main__":
     # File paths for input and output
-    input_file_path = "../metadata/GLC24-PA-metadata-train.csv"
-    output_file_path = "../metadata/PA_metadata_train.csv"
+    input_file_path = "../metadata/GLC24-PA-metadata-test.csv"
+    output_file_path = "../metadata/PA_metadata_test.csv"
 
     main(input_file_path, output_file_path)

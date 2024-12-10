@@ -1,3 +1,6 @@
+pandas
+requests
+tqdm
 geopandas
 tqdm
 reverse_geocoder
