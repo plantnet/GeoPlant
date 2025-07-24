@@ -1,0 +1,21 @@
+site_name: Spatial Plant Species Prediction Dataset
+site_url: https://plantnet.github.io/GeoPlant/
+repo_url: https://github.com/plantnet/GeoPlant
+repo_name: GeoPlant
+theme:
+  name: material
+  logo: assets/Frame 63.png
+  favicon: assets/favicon.png
+  palette:
+    - scheme: default
+      primary: green
+      accent: deep orange
+nav:
+  - Home: index.md
+  - Dataset Overview: dataset.md
+  - Environmental Predictors: environmental_predictors.md
+  - Baselines & Benchmarking: baselines.md
+  - Resources & Download: resources.md
+  - License: license.md
+markdown_extensions:
+  - admonition
