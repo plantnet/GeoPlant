@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://plantnet.github.io/GeoPlant/</loc>
+         <lastmod>2025-07-24</lastmod>
+    </url>
+    <url>
+         <loc>https://plantnet.github.io/GeoPlant/baselines/</loc>
+         <lastmod>2025-07-24</lastmod>
+    </url>
+    <url>
+         <loc>https://plantnet.github.io/GeoPlant/dataset/</loc>
+         <lastmod>2025-07-24</lastmod>
+    </url>
+    <url>
+         <loc>https://plantnet.github.io/GeoPlant/environmental_predictors/</loc>
+         <lastmod>2025-07-24</lastmod>
+    </url>
+    <url>
+         <loc>https://plantnet.github.io/GeoPlant/license/</loc>
+         <lastmod>2025-07-24</lastmod>
+    </url>
+    <url>
+         <loc>https://plantnet.github.io/GeoPlant/resources/</loc>
+         <lastmod>2025-07-24</lastmod>
+    </url>
+</urlset>

@@ -1,0 +1,860 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://plantnet.github.io/GeoPlant/baselines/">
+      
+      
+        <link rel="prev" href="../environmental_predictors/">
+      
+      
+        <link rel="next" href="../resources/">
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
+    
+    
+      
+        <title>Baselines & Benchmarking - Spatial Plant Species Prediction Dataset</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#baselines-benchmarking" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Spatial Plant Species Prediction Dataset" class="md-header__button md-logo" aria-label="Spatial Plant Species Prediction Dataset" data-md-component="logo">
+      
+  <img src="../assets/Frame 63.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Spatial Plant Species Prediction Dataset
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Baselines & Benchmarking
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="deep-orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/plantnet/GeoPlant" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GeoPlant
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Spatial Plant Species Prediction Dataset" class="md-nav__button md-logo" aria-label="Spatial Plant Species Prediction Dataset" data-md-component="logo">
+      
+  <img src="../assets/Frame 63.png" alt="logo">
+
+    </a>
+    Spatial Plant Species Prediction Dataset
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/plantnet/GeoPlant" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GeoPlant
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dataset Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environmental_predictors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environmental Predictors
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Baselines & Benchmarking
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Baselines & Benchmarking
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      💡 Benchmark Tasks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#naive-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      🪄 Naive Baselines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-modality-deep-learning-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔥 Single-Modality Deep Learning Baselines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conventional-ml-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      🤖 Conventional ML Baselines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multimodal-ensemble-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      🏆 Multimodal Ensemble Baselines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      💡 Additional Insights
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-reproduce" class="md-nav__link">
+    <span class="md-ellipsis">
+      📈 How to Reproduce?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-legend" class="md-nav__link">
+    <span class="md-ellipsis">
+      📋 Table Legend
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Resources & Download
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    License
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      💡 Benchmark Tasks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#naive-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      🪄 Naive Baselines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-modality-deep-learning-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔥 Single-Modality Deep Learning Baselines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conventional-ml-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      🤖 Conventional ML Baselines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multimodal-ensemble-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      🏆 Multimodal Ensemble Baselines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      💡 Additional Insights
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-reproduce" class="md-nav__link">
+    <span class="md-ellipsis">
+      📈 How to Reproduce?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-legend" class="md-nav__link">
+    <span class="md-ellipsis">
+      📋 Table Legend
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="baselines-benchmarking">🏁 Baselines &amp; Benchmarking</h1>
+<p>GeoPlant provides a variety of strong and weak baselines for plant species distribution modeling, using both conventional ML and deep learning approaches. All code is available on <a href="https://github.com/plantnet/GeoPlant">GitHub</a> and as reproducible Kaggle notebooks.</p>
+<h2 id="benchmark-tasks">💡 Benchmark Tasks</h2>
+<ul>
+<li><strong>Presence-Absence (PA) prediction:</strong> Predict the set of species present in a plot (multi-label).</li>
+<li><strong>Presence-Only (PO) experiments:</strong> (see Appendix) More challenging, due to missing absences.</li>
+</ul>
+<p>Evaluation Metrics:<br />
+- <strong>AUC</strong>, <strong>Recall</strong>, <strong>Sample-Averaged F1 ($F_1^s$)</strong>, and Precision<br />
+- Most results are reported for the <em>top-25 predicted species per plot</em>.</p>
+<hr />
+<h2 id="naive-baselines">🪄 Naive Baselines</h2>
+<p>Naive predictors select the most common species for a given region or administrative district.<br />
+- <em>Top-25 most common species per district</em>: <strong>$F_1^s$ = 20.6%</strong> (PA), <strong>&lt;9%</strong> (PO)</p>
+<hr />
+<h2 id="single-modality-deep-learning-baselines">🔥 Single-Modality Deep Learning Baselines</h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Modality</th>
+<th>AUC</th>
+<th>Recall</th>
+<th>F1<sup>s</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MLP</strong></td>
+<td>Climatic Cubes</td>
+<td>82.8</td>
+<td>32.1</td>
+<td>22.2</td>
+</tr>
+<tr>
+<td></td>
+<td>Landsat Cubes</td>
+<td>82.6</td>
+<td>42.0</td>
+<td>28.4</td>
+</tr>
+<tr>
+<td></td>
+<td>Sentinel-2 Img</td>
+<td>71.8</td>
+<td>23.2</td>
+<td>15.8</td>
+</tr>
+<tr>
+<td><strong>ResNet-6</strong></td>
+<td>Climatic Cubes</td>
+<td>91.8</td>
+<td>37.5</td>
+<td>26.2</td>
+</tr>
+<tr>
+<td></td>
+<td>Landsat Cubes</td>
+<td>92.1</td>
+<td>44.8</td>
+<td>30.3</td>
+</tr>
+<tr>
+<td></td>
+<td>Sentinel-2 Img</td>
+<td>87.3</td>
+<td>32.1</td>
+<td>22.0</td>
+</tr>
+<tr>
+<td><strong>ResNet-18</strong></td>
+<td>Climatic Cubes</td>
+<td>90.5</td>
+<td>37.8</td>
+<td>26.2</td>
+</tr>
+<tr>
+<td></td>
+<td>Landsat Cubes</td>
+<td>91.8</td>
+<td>44.2</td>
+<td>29.9</td>
+</tr>
+<tr>
+<td></td>
+<td>Sentinel-2 Img</td>
+<td>88.6</td>
+<td>33.2</td>
+<td>22.7</td>
+</tr>
+</tbody>
+</table>
+<p><em>All scores averaged over 5 random seeds, PA data only.</em></p>
+<hr />
+<h2 id="conventional-ml-baselines">🤖 Conventional ML Baselines</h2>
+<p><strong>XGBoost</strong> and <strong>MaxEnt</strong> were tested with up to four predictors (location, climate, soilgrids, land cover).</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Predictors Used</th>
+<th>AUC</th>
+<th>Recall</th>
+<th>F1<sup>s</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XGBoost</td>
+<td>Location only</td>
+<td>89.8</td>
+<td>47.6</td>
+<td>28.2</td>
+</tr>
+<tr>
+<td>XGBoost</td>
+<td>Climatic only</td>
+<td>88.9</td>
+<td>46.1</td>
+<td>26.7</td>
+</tr>
+<tr>
+<td>XGBoost</td>
+<td>Location + Clim + Soil + LC</td>
+<td>90.4</td>
+<td>48.8</td>
+<td>28.7</td>
+</tr>
+<tr>
+<td>MaxEnt</td>
+<td>All (492 species only)</td>
+<td>-</td>
+<td>-</td>
+<td>~0.17-0.18</td>
+</tr>
+</tbody>
+</table>
+<p><em>XGBoost outperforms MaxEnt, but both lag behind deep multimodal models.</em></p>
+<hr />
+<h2 id="multimodal-ensemble-baselines">🏆 Multimodal Ensemble Baselines</h2>
+<p>Combining modalities (climatic + landsat + satellite images) via an ensemble of encoders (ResNet-6) further improves results.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Modalities</th>
+<th>AUC</th>
+<th>Recall</th>
+<th>F1<sup>s</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MME</td>
+<td>Clim + Landsat</td>
+<td>93.6</td>
+<td>49.3</td>
+<td>33.8</td>
+</tr>
+<tr>
+<td>MME</td>
+<td>Clim + Landsat + Sentinel-2</td>
+<td>94.0</td>
+<td>49.7</td>
+<td>34.1</td>
+</tr>
+<tr>
+<td>MME + Top-K Estimation</td>
+<td>Clim + Landsat</td>
+<td>93.6</td>
+<td>45.0</td>
+<td>35.9</td>
+</tr>
+<tr>
+<td>MME + Top-K Estimation</td>
+<td>Clim + Landsat + Sentinel-2</td>
+<td>94.0</td>
+<td>45.3</td>
+<td>36.2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Diagram:</strong>
+<img alt="Multimodal Ensemble Model" src="assets/mme-graphical.png" />
+<em>Each modality (cube/image) is encoded, concatenated, and classified jointly.</em></p>
+<hr />
+<h2 id="additional-insights">💡 Additional Insights</h2>
+<ul>
+<li><strong>Top-K selection:</strong> Optimal number of species per survey is $k=20$–$30$ for cubes, $k=25$ for climate data.</li>
+<li><strong>Presence-Only (PO) Data:</strong> Training on PO and testing on PA gives much lower $F_1^s$ (as low as 8–15% for deep models).</li>
+<li><strong>Best Single Modality:</strong> Landsat cubes outperform Sentinel-2 images and climate alone.</li>
+</ul>
+<hr />
+<h2 id="how-to-reproduce">📈 How to Reproduce?</h2>
+<ul>
+<li>All experiments are in <a href="https://github.com/plantnet/GeoPlant">plantnet/GeoPlant</a> and on <a href="https://www.kaggle.com/datasets/picekl/GeoPlant/code">Kaggle</a>.</li>
+<li>Training logs: <a href="https://wandb.ai/picekl/GeoPlant">Weights &amp; Biases</a></li>
+</ul>
+<hr />
+<h2 id="table-legend">📋 Table Legend</h2>
+<ul>
+<li><strong>AUC:</strong> Area Under ROC Curve (binary per species, averaged).</li>
+<li><strong>Recall:</strong> Fraction of true species found in top-25 predictions.</li>
+<li><strong>F1<sup>s</sup>:</strong> Sample-averaged F1-score (across test plots, top-25 predictions).</li>
+</ul>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.56ea9cef.min.js"></script>
+      
+    
+  </body>
+</html>

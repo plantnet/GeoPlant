@@ -1,0 +1,750 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://plantnet.github.io/GeoPlant/dataset/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../environmental_predictors/">
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
+    
+    
+      
+        <title>Dataset Overview - Spatial Plant Species Prediction Dataset</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#geoplant-dataset" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Spatial Plant Species Prediction Dataset" class="md-header__button md-logo" aria-label="Spatial Plant Species Prediction Dataset" data-md-component="logo">
+      
+  <img src="../assets/Frame 63.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Spatial Plant Species Prediction Dataset
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Dataset Overview
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="deep-orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/plantnet/GeoPlant" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GeoPlant
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Spatial Plant Species Prediction Dataset" class="md-nav__button md-logo" aria-label="Spatial Plant Species Prediction Dataset" data-md-component="logo">
+      
+  <img src="../assets/Frame 63.png" alt="logo">
+
+    </a>
+    Spatial Plant Species Prediction Dataset
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/plantnet/GeoPlant" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GeoPlant
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Dataset Overview
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dataset Overview
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#species-observation-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Species Observation Data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Species Observation Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#presence-absence-pa-surveys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Presence-Absence (PA) surveys
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#presence-only-po-occurrences" class="md-nav__link">
+    <span class="md-ellipsis">
+      Presence-Only (PO) occurrences
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environmental-predictors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environmental Predictors
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environmental_predictors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environmental Predictors
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../baselines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Baselines & Benchmarking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Resources & Download
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    License
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#species-observation-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Species Observation Data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Species Observation Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#presence-absence-pa-surveys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Presence-Absence (PA) surveys
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#presence-only-po-occurrences" class="md-nav__link">
+    <span class="md-ellipsis">
+      Presence-Only (PO) occurrences
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environmental-predictors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environmental Predictors
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="geoplant-dataset">GeoPlant Dataset</h1>
+<p>The <strong>GeoPlant</strong> dataset comprises <em>Species Observation</em> data (i.e., <strong>Presence-Only (PO)</strong> occurrences and <strong>Presence-Absence (PA)</strong> surveys) and a wide set of <em>Environmental Predictors</em>. It covers 38 European countries and 8 major biogeographic regions (e.g., Alpine, Atlantic, and Boreal).</p>
+<p>For each species observation, we provide:</p>
+<ul>
+<li>Diverse <strong>environmental rasters</strong> (e.g., elevation, human footprint, land use, soil)</li>
+<li>Sentinel-2 <strong>RGB and Near-Infra-Red satellite images</strong> (128×128 pixels at 10 m resolution)</li>
+<li>A <strong>20-year time series of climatic variables</strong></li>
+<li><strong>Satellite time-series point values</strong> for six bands (R, G, B, NIR, SWIR1, SWIR2) from Landsat</li>
+</ul>
+<blockquote>
+<p><em>For a detailed description of all predictor modalities, see the <a href="predictors.md">Predictors &amp; Modalities</a> page.</em></p>
+</blockquote>
+<h3 id="_1"><img alt="Geo spatial scale of the dataset" src="../assets/map.png" /></h3>
+<p><strong>Figure 1. Geo spatial scale of the dataset.</strong> <em>Presence-Only (PO) data spans all habitable Europe, while Presence-Absence (PA) training and test sites are primarily in France, Denmark, Switzerland, and Czechia.</em></p>
+<hr />
+<h2 id="species-observation-data">Species Observation Data</h2>
+<p>The dataset contains approximately <strong>5M PO occurrences</strong> and around <strong>90K PA surveys</strong>.</p>
+<p>PO data covers most of Europe, but is sampled opportunistically without a standardized protocol, leading to various biases. Local observation of a species does <strong>not</strong> guarantee other species are truly absent. PA surveys are conducted by experts and provide much more reliable information.</p>
+<h3 id="presence-absence-pa-surveys">Presence-Absence (PA) surveys</h3>
+<p>A PA survey is an expert inventory of all plant species in a given plot (10–400 m²). All unobserved species are likely truly absent. </p>
+<ul>
+<li><strong>Source:</strong> 29 datasets hosted in the <a href="https://euroveg.org/eva-database/">European Vegetation Archive (EVA)</a></li>
+<li><strong>Size:</strong> 93,703 surveys covering 5,016 species (≈ half of the European flora)</li>
+<li><strong>Imbalance:</strong> Most species are rarely observed in PA surveys.</li>
+<li><strong>Train/Test Splits:</strong> 95%/5% using spatial block hold-out (10×10 km grid) to balance biogeographical regions.</li>
+</ul>
+<h3 id="presence-only-po-occurrences">Presence-Only (PO) occurrences</h3>
+<p>A PO occurrence is a geolocated species observation with unknown sampling protocol, providing no info on species absences. Sampling effort is highly heterogeneous in space, time, and across species—most PO records come from citizen science, are concentrated in accessible/populated areas, and focus on charismatic/easy species. Nevertheless, PO data helps compensate for PA survey gaps when models control for sampling bias.</p>
+<ul>
+<li><strong>Size:</strong> ~5 million records for 9,709 plant species (2017–2021)</li>
+<li><strong>Source:</strong> 13 pre-selected datasets from <a href="https://www.gbif.org/">GBIF</a></li>
+</ul>
+<p><strong>Table 1. Presence-Only dataset sources</strong> <em>Selected GBIF datasets cover 38 European countries. "Uniq. species" indicates the number of unique species in each dataset compared to the rest.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">GBIF Dataset Name</th>
+<th style="text-align: right;">Records</th>
+<th style="text-align: right;">Species</th>
+<th style="text-align: right;">Uniq. species</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/7a3679ef-5582-4aaa-81f0-8c2545cafc81">Pl@ntNet Observations</a> + <a href="https://www.gbif.org/dataset/14d5676a-2c54-4f94-9023-1e8dcd822aa0">Pl@ntNet Occurrences</a></td>
+<td style="text-align: right;">2,298,884</td>
+<td style="text-align: right;">4,631</td>
+<td style="text-align: right;">295</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/67fabcac-a638-40a6-9bea-aeca8aced9f1">Danmarks Miljøportals Naturdatabase</a></td>
+<td style="text-align: right;">691,313</td>
+<td style="text-align: right;">1,457</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/50c9509d-22c7-4a22-a47d-8c48425ef4a7">iNaturalist Research-grade Observations</a></td>
+<td style="text-align: right;">625,681</td>
+<td style="text-align: right;">7,496</td>
+<td style="text-align: right;">1,754</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/b124e1e0-4755-430f-9eab-894f25a9b59c">Norwegian Species Observation Service</a></td>
+<td style="text-align: right;">601,101</td>
+<td style="text-align: right;">2,243</td>
+<td style="text-align: right;">167</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/8a863029-f435-446a-821e-275f4f641165">Observation.org</a></td>
+<td style="text-align: right;">241,205</td>
+<td style="text-align: right;">5,108</td>
+<td style="text-align: right;">429</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/7f5e4129-0717-428e-876a-464fbd5d9a47">Non-native plant occurrences in Flanders/Brussels</a></td>
+<td style="text-align: right;">178,544</td>
+<td style="text-align: right;">1,464</td>
+<td style="text-align: right;">134</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/38b4c89f-584c-41bb-bd8f-cd1def33e92f">Artportalen (Swedish Species Observation System)</a></td>
+<td style="text-align: right;">163,513</td>
+<td style="text-align: right;">2,771</td>
+<td style="text-align: right;">464</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/9a6bdcc9-e017-44ea-9cf9-ff6a87fdb8c2">National Plant Monitoring Scheme U.K.</a></td>
+<td style="text-align: right;">120,413</td>
+<td style="text-align: right;">1,109</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/0a013f89-5381-4578-9d82-5f28fd5f1ef6">Vascular plant records via iRecord</a></td>
+<td style="text-align: right;">103,213</td>
+<td style="text-align: right;">2,179</td>
+<td style="text-align: right;">99</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/83fdfd3d-3a25-4705-9fbe-3db1d1892b13">Swiss National Databank of Vascular Plants</a></td>
+<td style="text-align: right;">49,173</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/ebf3c079-f88e-4b85-bcc5-f568229e68f3">Invazivke - Invasive Alien Species in Slovenia</a></td>
+<td style="text-align: right;">4,171</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="https://www.gbif.org/dataset/54f946aa-2ca9-4a51-9ee5-011219e0381e">Masaryk University - Herbarium BRNU</a></td>
+<td style="text-align: right;">2,586</td>
+<td style="text-align: right;">1,321</td>
+<td style="text-align: right;">122</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>GeoPlant PO data (Combined)</strong></td>
+<td style="text-align: right;">5,079,797</td>
+<td style="text-align: right;">9,709</td>
+<td style="text-align: right;">---</td>
+</tr>
+</tbody>
+</table>
+<h2 id="environmental-predictors">Environmental Predictors</h2>
+<p>The environmental predictor data are crucial for modeling.<br />
+Each observation (PO or PA) is accompanied by:</p>
+<ul>
+<li>A <strong>4-band 128×128 satellite image at 10 m</strong> resolution (Sentinel-2)</li>
+<li><strong>Time series of 6 satellite bands</strong> (Landsat; R, G, B, NIR, SWIR1, SWIR2; 1999–2020)</li>
+<li><strong>Environmental rasters</strong> at European scale: climate, soil, elevation, land use, human footprint</li>
+<li><strong>Monthly climatic rasters</strong> (CHELSA; 4 variables, 2000–2019)</li>
+</ul>
+<blockquote>
+<p><strong>For full details and variable lists, see the <a href="predictors.md">Predictors &amp; Modalities</a> page.</strong></p>
+</blockquote>
+<hr />
+<p><em>For data download and file structure, see the <a href="../resources/">Resources</a> page.</em><br />
+<em>Please cite the GeoPlant paper if you use or redistribute this dataset.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.56ea9cef.min.js"></script>
+      
+    
+  </body>
+</html>
