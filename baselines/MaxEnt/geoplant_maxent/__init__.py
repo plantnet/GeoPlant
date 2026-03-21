@@ -1,4 +1,4 @@
-"""GeoPlant XGBoost baseline utilities."""
+"""GeoPlant MaxEnt-style baseline utilities."""
 
 from .config import ExperimentConfig, PredictorPairSpec
 from .data import (

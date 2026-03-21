@@ -1,4 +1,4 @@
-"""Configuration objects for GeoPlant XGBoost experiments."""
+"""Configuration objects for GeoPlant MaxEnt experiments."""
 
 from __future__ import annotations
 
@@ -14,18 +14,11 @@ DEFAULT_GROUP_PREFIXES = {
     "meta": ["meta_"],
 }
 
-DEFAULT_XGB_PARAMS = {
-    "n_estimators": 300,
-    "max_depth": 6,
-    "learning_rate": 0.05,
-    "subsample": 0.8,
-    "colsample_bytree": 0.8,
-    "reg_lambda": 1.0,
-    "tree_method": "hist",
-    "n_jobs": 8,
-    "random_state": 42,
-    "eval_metric": "logloss",
-    "verbosity": 0,
+DEFAULT_MAXENT_PARAMS = {
+    "C": 1.0,
+    "max_iter": 1000,
+    "solver": "lbfgs",
+    "class_weight": "balanced",
 }
 
 DEFAULT_METADATA_CATEGORICAL = [
@@ -53,7 +46,7 @@ class PredictorPairSpec:
 
 @dataclass
 class ExperimentConfig:
-    """Experiment configuration and schema hints for GeoPlant baselines."""
+    """Experiment configuration and schema hints for GeoPlant MaxEnt baselines."""
 
     sample_id_col: str = "survey_id"
     source_sample_id_col: str = "surveyId"
@@ -77,11 +70,10 @@ class ExperimentConfig:
     )
     top_species_n: int = 500
     min_pos_per_species: int = 5
-    xgb_params: dict = field(default_factory=lambda: dict(DEFAULT_XGB_PARAMS))
-    early_stopping_rounds: int = 30
+    maxent_params: dict = field(default_factory=lambda: dict(DEFAULT_MAXENT_PARAMS))
     fixed_top_k: int = 25
     use_richness_estimator: bool = True
     richness_offset: int = 5
+    richness_nbins: int = 15
     ablations: list[list[str]] = field(default_factory=lambda: [["climatic"]])
     output_dir: str = "outputs"
-

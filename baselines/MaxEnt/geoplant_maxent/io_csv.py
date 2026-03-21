@@ -40,16 +40,9 @@ def _collapse_metadata_rows(
     dataset_name: str,
 ) -> pd.DataFrame:
     _require_column(metadata, cfg.source_sample_id_col, dataset_name)
-    collapsed = metadata.copy()
-    collapsed = _rename_alias_columns(collapsed, cfg.metadata_aliases)
-
-    non_label_columns = [
-        column
-        for column in collapsed.columns
-        if column != cfg.species_id_col
-    ]
-    collapsed = collapsed[non_label_columns]
-    collapsed = collapsed.groupby(cfg.source_sample_id_col, as_index=False).first()
+    collapsed = _rename_alias_columns(metadata.copy(), cfg.metadata_aliases)
+    non_label_columns = [column for column in collapsed.columns if column != cfg.species_id_col]
+    collapsed = collapsed[non_label_columns].groupby(cfg.source_sample_id_col, as_index=False).first()
     _ensure_unique_ids(collapsed, cfg.source_sample_id_col, dataset_name)
     collapsed[cfg.sample_id_col] = collapsed[cfg.source_sample_id_col]
     return collapsed
@@ -74,7 +67,6 @@ def _select_numeric_predictors(dataframe: pd.DataFrame, spec: PredictorPairSpec)
     ]
     if not numeric_columns:
         raise ValueError(f"Predictor file `{spec.name}` does not contain numeric columns")
-
     selected = dataframe[["surveyId"] + sorted(numeric_columns)].copy()
     selected.rename(
         columns={column: f"{spec.prefix}{column}" for column in numeric_columns},
@@ -91,11 +83,9 @@ def load_predictor_pairs(
     train_map: Dict[str, pd.DataFrame] = {}
     test_map: Dict[str, pd.DataFrame] = {}
     for spec in pairs:
-        train_raw = pd.read_csv(spec.train_path)
-        test_raw = pd.read_csv(spec.test_path)
-        train_map[spec.name] = _select_numeric_predictors(train_raw, spec)
+        train_map[spec.name] = _select_numeric_predictors(pd.read_csv(spec.train_path), spec)
         test_map[spec.name] = _select_numeric_predictors(
-            test_raw,
+            pd.read_csv(spec.test_path),
             PredictorPairSpec(
                 name=spec.name,
                 group=spec.group,
@@ -115,29 +105,13 @@ def build_features_from_meta_and_predictors_pair(
     test_predictors_by_name: Dict[str, pd.DataFrame],
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Encode metadata and merge predictor families into train/test feature tables."""
-    train_meta = _collapse_metadata_rows(
-        train_metadata,
-        experiment_config,
-        "train metadata",
-    )
-    test_meta = _collapse_metadata_rows(
-        test_metadata,
-        experiment_config,
-        "test metadata",
-    )
+    train_meta = _collapse_metadata_rows(train_metadata, experiment_config, "train metadata")
+    test_meta = _collapse_metadata_rows(test_metadata, experiment_config, "test metadata")
 
     train_geo = to_numeric(train_meta, experiment_config.metadata_geo_columns)
     test_geo = to_numeric(test_meta, experiment_config.metadata_geo_columns)
-    train_num = to_numeric(
-        train_meta,
-        experiment_config.metadata_numeric_columns,
-        add_prefix="loc_",
-    )
-    test_num = to_numeric(
-        test_meta,
-        experiment_config.metadata_numeric_columns,
-        add_prefix="loc_",
-    )
+    train_num = to_numeric(train_meta, experiment_config.metadata_numeric_columns, add_prefix="loc_")
+    test_num = to_numeric(test_meta, experiment_config.metadata_numeric_columns, add_prefix="loc_")
     train_cat, test_cat = align_one_hot(
         train_meta,
         test_meta,
@@ -169,5 +143,4 @@ def build_features_from_meta_and_predictors_pair(
             on=experiment_config.sample_id_col,
             how="left",
         )
-
     return train_features, test_features

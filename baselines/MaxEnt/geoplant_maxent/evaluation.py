@@ -27,7 +27,6 @@ def lists_to_wide(
     all_ids: set[int] = set()
     for species_list in solution_df["speciesList"].astype(str):
         all_ids.update(int(token) for token in species_list.split() if token)
-
     species_columns = [f"{species_prefix}{species_id}" for species_id in sorted(all_ids)]
     wide = pd.DataFrame({"survey_id": solution_df["surveyId"].values})
     for species_column in species_columns:

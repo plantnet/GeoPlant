@@ -1,0 +1,32 @@
+
+site_name: GeoPlant XGBoost Baseline
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - content.code.copy
+    - content.code.annotate
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - tables
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+nav:
+  - Overview: index.md
+  - Getting Started: getting-started.md
+  - Data Schema: data-schema.md
+  - Running Ablations: running-ablations.md
+  - Baseline Results: baseline-results.md
+  - API Reference:
+      - config: api/config.md
+      - io_csv: api/io_csv.md
+      - data: api/data.md
+      - model: api/model.md
+      - metrics: api/metrics.md
+      - experiment: api/experiment.md
+      - predict: api/predict.md
+      - evaluation: api/evaluation.md

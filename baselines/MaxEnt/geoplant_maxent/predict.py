@@ -20,7 +20,6 @@ def export_predictions(
     """Export predictions as a surveyId/predictions table."""
     if sample_id_col not in features_matrix.columns:
         raise ValueError(f"`{sample_id_col}` missing in features_matrix")
-
     scoring_features = features_matrix.drop(columns=[sample_id_col])
     scores = predict_scores(models_by_species, scoring_features, species_column_names)
     if isinstance(topk_per_sample, int):
@@ -29,7 +28,6 @@ def export_predictions(
         k_values = np.asarray(topk_per_sample, dtype=int)
         if k_values.shape[0] != scores.shape[0]:
             raise ValueError("topk_per_sample length must match the number of samples")
-
     sorted_idx = np.argsort(-scores, axis=1)
     predictions = []
     for row_index in range(scores.shape[0]):
@@ -37,7 +35,6 @@ def export_predictions(
         selected = sorted_idx[row_index, :k_value]
         species_ids = [species_column_names[index].removeprefix("sp_") for index in selected]
         predictions.append(" ".join(species_ids))
-
     return pd.DataFrame(
         {
             "surveyId": features_matrix[sample_id_col].values,

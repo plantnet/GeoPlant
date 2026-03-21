@@ -12,11 +12,13 @@ def align_one_hot(
     prefix: str,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """One-hot encode the same categorical schema for train and test frames."""
-    present = [column for column in columns if column in train_frame.columns or column in test_frame.columns]
+    present = [
+        column
+        for column in columns
+        if column in train_frame.columns or column in test_frame.columns
+    ]
     if not present:
-        empty_train = pd.DataFrame(index=train_frame.index)
-        empty_test = pd.DataFrame(index=test_frame.index)
-        return empty_train, empty_test
+        return pd.DataFrame(index=train_frame.index), pd.DataFrame(index=test_frame.index)
 
     combined = pd.concat(
         [

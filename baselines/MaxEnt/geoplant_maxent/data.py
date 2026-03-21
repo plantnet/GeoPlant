@@ -20,7 +20,6 @@ def build_wide_labels_from_long_metadata(
     missing = required.difference(train_metadata_long.columns)
     if missing:
         raise ValueError(f"Required columns missing in train metadata: {sorted(missing)}")
-
     pairs = (
         train_metadata_long[[survey_id_column, species_id_column]]
         .dropna(subset=[survey_id_column, species_id_column])
@@ -47,12 +46,8 @@ def align_features_with_labels(
         raise ValueError("Label rows must be unique per survey")
 
     merged = features_table.merge(labels_wide_table, on=survey_id_column, how="inner")
-    species_column_names = sorted(
-        column for column in merged.columns if column.startswith("sp_")
-    )
-    feature_columns = [
-        column for column in features_table.columns if column != survey_id_column
-    ]
+    species_column_names = sorted(column for column in merged.columns if column.startswith("sp_"))
+    feature_columns = [column for column in features_table.columns if column != survey_id_column]
     return (
         merged[[survey_id_column] + feature_columns],
         merged[[survey_id_column] + species_column_names],

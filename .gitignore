@@ -152,3 +152,4 @@ data/
 # output directories
 **/out/
 
+resources/

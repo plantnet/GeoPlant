@@ -1,4 +1,4 @@
-"""Experiment orchestration for XGBoost ablations."""
+"""Experiment orchestration for MaxEnt ablations."""
 
 from __future__ import annotations
 
