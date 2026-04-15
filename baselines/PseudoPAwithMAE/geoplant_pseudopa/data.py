@@ -57,7 +57,10 @@ class SpeciesExample:
 
 class SpeciesSetDataset(Dataset[SpeciesExample]):
     def __init__(self, frame: pd.DataFrame, num_species: int):
-        self.frame = frame.reset_index(drop=True)
+        self.frame = frame.reset_index(drop=True).copy()
+        if "species_set" not in self.frame.columns:
+            raise ValueError("SpeciesSetDataset requires a species_set column")
+        self.frame["species_set"] = self.frame["species_set"].apply(parse_species_set)
         self.num_species = num_species
 
     def __len__(self) -> int:

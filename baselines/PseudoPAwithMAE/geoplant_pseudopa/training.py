@@ -6,6 +6,7 @@ from itertools import cycle
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
+from tqdm.auto import tqdm
 
 from .config import JointTrainingConfig
 from .evaluation import evaluate_pa_topk, initialize_species_bias_from_pa
@@ -60,7 +61,6 @@ def masked_pa_loss(
     batch_size, num_species = x.shape
     device = x.device
 
-    masked_inputs = x.clone()
     batch_losses = []
     batch_mask_fraction = []
 
@@ -72,7 +72,8 @@ def masked_pa_loss(
         num_masked = max(1, int(round(mask_ratio * pos_idx.numel())))
         chosen = torch.randperm(pos_idx.numel(), device=device)[:num_masked]
         masked_idx = pos_idx[chosen]
-        masked_inputs[row_idx, masked_idx] = 0.0
+        masked_input = x[row_idx : row_idx + 1].clone()
+        masked_input[0, masked_idx] = 0.0
 
         num_negatives = max(1, int(round(negative_ratio * masked_idx.numel())))
         neg_idx = sample_negative_indices(
@@ -90,7 +91,7 @@ def masked_pa_loss(
                 torch.zeros(neg_idx.numel(), device=device),
             ]
         )
-        logits = model.score_indices(model.encode_plot(masked_inputs[row_idx : row_idx + 1]), eval_idx).squeeze(0)
+        logits = model.score_indices(model.encode_plot(masked_input), eval_idx).squeeze(0)
         batch_losses.append(F.binary_cross_entropy_with_logits(logits.float(), targets.float()))
         batch_mask_fraction.append(masked_idx.numel() / pos_idx.numel())
 
@@ -159,7 +160,8 @@ def run_epoch(
     total_examples = 0
     total_mask_fraction = 0.0
 
-    for batch in loader:
+    progress = tqdm(loader, desc=f"{mode.upper()} train", leave=False)
+    for batch in progress:
         x = batch["x"].to(device)
         prevalence_weights = build_frequency_weights(
             x,
@@ -196,6 +198,11 @@ def run_epoch(
         total_pa_loss += float(pa_loss.item()) * batch_size
         total_po_loss += float(po_loss.item()) * batch_size
         total_mask_fraction += mask_fraction * batch_size
+        progress.set_postfix(
+            pa_loss=f"{float(pa_loss.item()):.4f}",
+            po_loss=f"{float(po_loss.item()):.4f}",
+            mask=f"{mask_fraction:.3f}",
+        )
 
     if total_examples == 0:
         return {"pa_loss": 0.0, "po_loss": 0.0, "mask_fraction": 0.0}
@@ -238,7 +245,20 @@ def train_joint_model(
     )
 
     history: list[dict[str, float]] = []
+    print(
+        "Starting training with",
+        {
+            "device": str(device_obj),
+            "warmup_pa_epochs": config.warmup_pa_epochs,
+            "joint_epochs": config.joint_epochs,
+            "pa_train_plots": len(pa_train_loader.dataset),
+            "po_train_plots": len(po_train_loader.dataset),
+            "val_plots": len(val_loader.dataset),
+            "batch_size": config.batch_size,
+        },
+    )
     for epoch in range(config.warmup_pa_epochs):
+        print(f"[Warmup {epoch + 1}/{config.warmup_pa_epochs}]")
         train_metrics = run_epoch(
             model,
             pa_train_loader,
@@ -256,8 +276,18 @@ def train_joint_model(
                 **val_metrics,
             }
         )
+        print(
+            "  train:",
+            {
+                "pa_loss": round(train_metrics["pa_loss"], 4),
+                "po_loss": round(train_metrics["po_loss"], 4),
+                "mask_fraction": round(train_metrics["mask_fraction"], 4),
+            },
+        )
+        print("  val:", {key: round(value, 4) for key, value in val_metrics.items()})
 
     for epoch in range(config.joint_epochs):
+        print(f"[Joint {epoch + 1}/{config.joint_epochs}]")
         train_metrics = run_joint_epoch(
             model,
             pa_train_loader,
@@ -275,6 +305,15 @@ def train_joint_model(
                 **val_metrics,
             }
         )
+        print(
+            "  train:",
+            {
+                "pa_loss": round(train_metrics["pa_loss"], 4),
+                "po_loss": round(train_metrics["po_loss"], 4),
+                "mask_fraction": round(train_metrics["mask_fraction"], 4),
+            },
+        )
+        print("  val:", {key: round(value, 4) for key, value in val_metrics.items()})
 
     model.training_summary = {
         "config": asdict(config),
@@ -303,7 +342,8 @@ def run_joint_epoch(
 
     po_iterator = cycle(po_loader) if len(po_loader) > 0 else None
 
-    for pa_batch in pa_loader:
+    progress = tqdm(pa_loader, desc="JOINT train", leave=False)
+    for pa_batch in progress:
         x_pa = pa_batch["x"].to(device)
         pa_weights = build_frequency_weights(
             x_pa,
@@ -347,6 +387,12 @@ def run_joint_epoch(
         total_pa_loss += float(pa_loss.item()) * pa_batch_size
         total_po_loss += float(po_loss.item()) * max(1, po_batch_size)
         total_mask_fraction += mask_fraction * pa_batch_size
+        progress.set_postfix(
+            pa_loss=f"{float(pa_loss.item()):.4f}",
+            po_loss=f"{float(po_loss.item()):.4f}",
+            mask=f"{mask_fraction:.3f}",
+            po_batch=po_batch_size,
+        )
 
     if total_examples == 0:
         return {"pa_loss": 0.0, "po_loss": 0.0, "mask_fraction": 0.0}
