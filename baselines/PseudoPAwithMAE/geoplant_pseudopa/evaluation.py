@@ -138,3 +138,45 @@ def evaluate_completion_from_pa(
         metrics[f"completion_precision@{k}"] = precision_sums[k] / total_plots
         metrics[f"hidden_recall@{k}"] = hidden_recall_sums[k] / total_plots
     return metrics
+
+
+@torch.no_grad()
+def evaluate_completion_from_inputs(
+    model: TwoTowerSpeciesModel,
+    *,
+    x_input: torch.Tensor,
+    x_true: torch.Tensor,
+    device: torch.device,
+    ks: tuple[int, ...] = (5, 10, 20),
+) -> dict[str, float]:
+    model.eval()
+    if x_input.shape != x_true.shape:
+        raise ValueError(f"x_input shape {x_input.shape} does not match x_true shape {x_true.shape}")
+    if x_input.ndim != 2:
+        raise ValueError("x_input and x_true must be rank-2 tensors")
+
+    x_input = x_input.to(device)
+    x_true = x_true.to(device)
+    logits = model.score_all_species(x_input)
+    probs = torch.sigmoid(logits)
+
+    observed_mask = x_input > 0
+    hidden_targets = (x_true > 0) & (~observed_mask)
+    probs = probs.masked_fill(observed_mask, float("-inf"))
+    top_idx = torch.topk(probs, k=max(ks), dim=1).indices
+
+    total_plots = x_true.shape[0]
+    true_count = x_true.sum(dim=1).clamp_min(1.0)
+    hidden_count = hidden_targets.sum(dim=1).clamp_min(1.0)
+    predicted_richness = torch.sigmoid(logits.masked_fill(observed_mask, -30.0)).sum(dim=1)
+    richness_error = float((predicted_richness - true_count).abs().sum().item()) / max(1, total_plots)
+
+    metrics = {"completion_richness_l1": richness_error}
+    for k in ks:
+        pred_idx = top_idx[:, :k]
+        full_hits = x_true.gather(1, pred_idx).sum(dim=1)
+        hidden_hits = hidden_targets.float().gather(1, pred_idx).sum(dim=1)
+        metrics[f"completion_recall@{k}"] = float((full_hits / true_count).sum().item()) / max(1, total_plots)
+        metrics[f"completion_precision@{k}"] = float((full_hits / float(k)).sum().item()) / max(1, total_plots)
+        metrics[f"hidden_recall@{k}"] = float((hidden_hits / hidden_count).sum().item()) / max(1, total_plots)
+    return metrics
