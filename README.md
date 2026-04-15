@@ -48,6 +48,7 @@ It integrates expert-verified species observations with rich environmental predi
 |------------------------------|-----------------------------------------------------------------------------------------------|
 | `picekl/xgboost-baselines`   | XGBoost tabular baselines + ablations (location, climate, soil, land cover, human footprint). |
 | `picekl/MME-baselines`       | Multimodal ensemble (Sentinel-2, Landsat, climate) notebooks + training scripts.              |
+| `picekl/pseudopa-mae`        | Notebook-based two-tower PseudoPA + MAE baseline integration.                                  |
 | `picekl/initial-experiemnts` | Initial experiments, dataset preprocessing etc.                                               |
 | `docs`                       | Sources for the website documentation.                                                        |
 
