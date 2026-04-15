@@ -7,6 +7,9 @@ class JointTrainingConfig:
     embedding_dim: int = 256
     hidden_dim: int = 1024
     dropout: float = 0.1
+    use_location: bool = False
+    location_dim: int = 2
+    location_hidden_dim: int = 64
     mask_ratio: float = 0.4
     pa_negative_ratio: float = 8.0
     po_negative_ratio: float = 4.0

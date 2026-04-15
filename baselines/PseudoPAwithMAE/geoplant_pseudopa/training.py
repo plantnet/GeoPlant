@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
 from .config import JointTrainingConfig
-from .evaluation import evaluate_pa_topk, initialize_species_bias_from_pa
+from .evaluation import evaluate_location_sdm, evaluate_pa_topk, initialize_species_bias_from_pa
 from .model import TwoTowerSpeciesModel
 
 
@@ -53,10 +53,12 @@ def sample_negative_indices(
 def masked_pa_loss(
     model: TwoTowerSpeciesModel,
     x: torch.Tensor,
+    loc: torch.Tensor | None = None,
     *,
     mask_ratio: float,
     negative_ratio: float,
     prevalence_weights: torch.Tensor | None = None,
+    location_only_input: bool = False,
 ) -> tuple[torch.Tensor, float]:
     batch_size, num_species = x.shape
     device = x.device
@@ -72,8 +74,12 @@ def masked_pa_loss(
         num_masked = max(1, int(round(mask_ratio * pos_idx.numel())))
         chosen = torch.randperm(pos_idx.numel(), device=device)[:num_masked]
         masked_idx = pos_idx[chosen]
-        masked_input = x[row_idx : row_idx + 1].clone()
-        masked_input[0, masked_idx] = 0.0
+        if location_only_input:
+            masked_input = torch.zeros_like(x[row_idx : row_idx + 1])
+        else:
+            masked_input = x[row_idx : row_idx + 1].clone()
+            masked_input[0, masked_idx] = 0.0
+        masked_loc = None if loc is None else loc[row_idx : row_idx + 1]
 
         num_negatives = max(1, int(round(negative_ratio * masked_idx.numel())))
         neg_idx = sample_negative_indices(
@@ -91,7 +97,7 @@ def masked_pa_loss(
                 torch.zeros(neg_idx.numel(), device=device),
             ]
         )
-        logits = model.score_indices(model.encode_plot(masked_input), eval_idx).squeeze(0)
+        logits = model.score_indices(model.encode_plot(masked_input, loc=masked_loc), eval_idx).squeeze(0)
         batch_losses.append(F.binary_cross_entropy_with_logits(logits.float(), targets.float()))
         batch_mask_fraction.append(masked_idx.numel() / pos_idx.numel())
 
@@ -105,14 +111,17 @@ def masked_pa_loss(
 def po_ranking_loss(
     model: TwoTowerSpeciesModel,
     x: torch.Tensor,
+    loc: torch.Tensor | None = None,
     *,
     negative_ratio: float,
     max_positives_per_plot: int,
     prevalence_weights: torch.Tensor | None = None,
+    location_only_input: bool = False,
 ) -> torch.Tensor:
     batch_size, num_species = x.shape
     device = x.device
-    plot_embeddings = model.encode_plot(x)
+    plot_input = torch.zeros_like(x) if location_only_input else x
+    plot_embeddings = model.encode_plot(plot_input, loc=loc)
     losses = []
 
     for row_idx in range(batch_size):
@@ -153,6 +162,7 @@ def run_epoch(
     mode: str,
     config: JointTrainingConfig,
     device: torch.device,
+    location_only_input: bool = False,
 ) -> dict[str, float]:
     model.train()
     total_pa_loss = 0.0
@@ -163,6 +173,9 @@ def run_epoch(
     progress = tqdm(loader, desc=f"{mode.upper()} train", leave=False)
     for batch in progress:
         x = batch["x"].to(device)
+        loc = batch.get("loc")
+        if isinstance(loc, torch.Tensor):
+            loc = loc.to(device)
         prevalence_weights = build_frequency_weights(
             x,
             temperature=config.prevalence_temperature,
@@ -172,9 +185,11 @@ def run_epoch(
         pa_loss, mask_fraction = masked_pa_loss(
             model,
             x,
+            loc,
             mask_ratio=config.mask_ratio,
             negative_ratio=config.pa_negative_ratio,
             prevalence_weights=prevalence_weights,
+            location_only_input=location_only_input,
         )
 
         po_loss = x.new_zeros(())
@@ -182,9 +197,11 @@ def run_epoch(
             po_loss = po_ranking_loss(
                 model,
                 x,
+                loc,
                 negative_ratio=config.po_negative_ratio,
                 max_positives_per_plot=config.max_po_positives_per_plot,
                 prevalence_weights=prevalence_weights,
+                location_only_input=location_only_input,
             )
 
         loss = pa_loss + config.lambda_po * po_loss
@@ -228,6 +245,9 @@ def train_joint_model(
         embedding_dim=config.embedding_dim,
         hidden_dim=config.hidden_dim,
         dropout=config.dropout,
+        use_location=config.use_location,
+        location_dim=config.location_dim,
+        location_hidden_dim=config.location_hidden_dim,
     ).to(device_obj)
 
     with torch.no_grad():
@@ -255,6 +275,7 @@ def train_joint_model(
             "po_train_plots": len(po_train_loader.dataset),
             "val_plots": len(val_loader.dataset),
             "batch_size": config.batch_size,
+            "use_location": config.use_location,
         },
     )
     for epoch in range(config.warmup_pa_epochs):
@@ -266,6 +287,7 @@ def train_joint_model(
             mode="pa",
             config=config,
             device=device_obj,
+            location_only_input=False,
         )
         val_metrics = evaluate_pa_topk(model, val_loader, device=device_obj)
         history.append(
@@ -295,6 +317,7 @@ def train_joint_model(
             optimizer,
             config=config,
             device=device_obj,
+            location_only_input=False,
         )
         val_metrics = evaluate_pa_topk(model, val_loader, device=device_obj)
         history.append(
@@ -330,6 +353,7 @@ def run_joint_epoch(
     *,
     config: JointTrainingConfig,
     device: torch.device,
+    location_only_input: bool = False,
 ) -> dict[str, float]:
     model.train()
     total_pa_loss = 0.0
@@ -345,6 +369,9 @@ def run_joint_epoch(
     progress = tqdm(pa_loader, desc="JOINT train", leave=False)
     for pa_batch in progress:
         x_pa = pa_batch["x"].to(device)
+        loc_pa = pa_batch.get("loc")
+        if isinstance(loc_pa, torch.Tensor):
+            loc_pa = loc_pa.to(device)
         pa_weights = build_frequency_weights(
             x_pa,
             temperature=config.prevalence_temperature,
@@ -353,9 +380,11 @@ def run_joint_epoch(
         pa_loss, mask_fraction = masked_pa_loss(
             model,
             x_pa,
+            loc_pa,
             mask_ratio=config.mask_ratio,
             negative_ratio=config.pa_negative_ratio,
             prevalence_weights=pa_weights,
+            location_only_input=location_only_input,
         )
 
         po_loss = x_pa.new_zeros(())
@@ -363,6 +392,9 @@ def run_joint_epoch(
         if po_iterator is not None:
             po_batch = next(po_iterator)
             x_po = po_batch["x"].to(device)
+            loc_po = po_batch.get("loc")
+            if isinstance(loc_po, torch.Tensor):
+                loc_po = loc_po.to(device)
             po_batch_size = x_po.shape[0]
             po_weights = build_frequency_weights(
                 x_po,
@@ -372,9 +404,11 @@ def run_joint_epoch(
             po_loss = po_ranking_loss(
                 model,
                 x_po,
+                loc_po,
                 negative_ratio=config.po_negative_ratio,
                 max_positives_per_plot=config.max_po_positives_per_plot,
                 prevalence_weights=po_weights,
+                location_only_input=location_only_input,
             )
 
         loss = pa_loss + config.lambda_po * po_loss
@@ -402,3 +436,94 @@ def run_joint_epoch(
         "po_loss": total_po_loss / max(1, total_examples),
         "mask_fraction": total_mask_fraction / max(1, len(pa_loader.dataset)),
     }
+
+
+def train_location_sdm_model(
+    pa_train_loader: DataLoader,
+    po_train_loader: DataLoader,
+    val_loader: DataLoader,
+    *,
+    config: JointTrainingConfig,
+    device: str = "cpu",
+) -> tuple[TwoTowerSpeciesModel, list[dict[str, float]]]:
+    device_obj = torch.device(device)
+    model = TwoTowerSpeciesModel(
+        config.num_species,
+        embedding_dim=config.embedding_dim,
+        hidden_dim=config.hidden_dim,
+        dropout=config.dropout,
+        use_location=config.use_location,
+        location_dim=config.location_dim,
+        location_hidden_dim=config.location_hidden_dim,
+    ).to(device_obj)
+
+    with torch.no_grad():
+        initialize_species_bias_from_pa(
+            model,
+            pa_train_loader,
+            device=device_obj,
+            prevalence_floor=config.prevalence_floor,
+        )
+
+    optimizer = torch.optim.AdamW(
+        model.parameters(),
+        lr=config.learning_rate,
+        weight_decay=config.weight_decay,
+    )
+
+    history: list[dict[str, float]] = []
+    print(
+        "Starting location-only SDM training with",
+        {
+            "device": str(device_obj),
+            "warmup_pa_epochs": config.warmup_pa_epochs,
+            "joint_epochs": config.joint_epochs,
+            "pa_train_plots": len(pa_train_loader.dataset),
+            "po_train_plots": len(po_train_loader.dataset),
+            "val_plots": len(val_loader.dataset),
+            "batch_size": config.batch_size,
+            "use_location": config.use_location,
+        },
+    )
+
+    for epoch in range(config.warmup_pa_epochs):
+        print(f"[SDM Warmup {epoch + 1}/{config.warmup_pa_epochs}]")
+        train_metrics = run_epoch(
+            model,
+            pa_train_loader,
+            optimizer,
+            mode="pa",
+            config=config,
+            device=device_obj,
+            location_only_input=True,
+        )
+        val_metrics = evaluate_location_sdm(model, val_loader, device=device_obj)
+        history.append({"epoch": float(epoch + 1), "stage": 0.0, **train_metrics, **val_metrics})
+        print("  train:", {key: round(value, 4) for key, value in train_metrics.items()})
+        print("  val:", {key: round(value, 4) for key, value in val_metrics.items()})
+
+    for epoch in range(config.joint_epochs):
+        print(f"[SDM Joint {epoch + 1}/{config.joint_epochs}]")
+        train_metrics = run_joint_epoch(
+            model,
+            pa_train_loader,
+            po_train_loader,
+            optimizer,
+            config=config,
+            device=device_obj,
+            location_only_input=True,
+        )
+        val_metrics = evaluate_location_sdm(model, val_loader, device=device_obj)
+        history.append(
+            {
+                "epoch": float(config.warmup_pa_epochs + epoch + 1),
+                "stage": 1.0,
+                **train_metrics,
+                **val_metrics,
+            }
+        )
+        print("  train:", {key: round(value, 4) for key, value in train_metrics.items()})
+        print("  val:", {key: round(value, 4) for key, value in val_metrics.items()})
+
+    model.training_summary = {"config": asdict(config), "history": history, "task": "location_only_sdm"}
+    return model, history
