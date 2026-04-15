@@ -2,9 +2,9 @@
 
 from .config import JointTrainingConfig
 from .data import SpeciesSetDataset, load_metadata_frame, split_frame
-from .evaluation import evaluate_completion_from_inputs, evaluate_completion_from_pa, evaluate_pa_topk, initialize_species_bias_from_pa
+from .evaluation import evaluate_completion_from_inputs, evaluate_completion_from_pa, evaluate_location_sdm, evaluate_pa_topk, initialize_species_bias_from_pa
 from .model import TwoTowerSpeciesModel
-from .training import train_joint_model
+from .training import train_joint_model, train_location_sdm_model
 
 __all__ = [
     "JointTrainingConfig",
@@ -12,9 +12,11 @@ __all__ = [
     "TwoTowerSpeciesModel",
     "evaluate_completion_from_inputs",
     "evaluate_completion_from_pa",
+    "evaluate_location_sdm",
     "evaluate_pa_topk",
     "initialize_species_bias_from_pa",
     "load_metadata_frame",
     "split_frame",
     "train_joint_model",
+    "train_location_sdm_model",
 ]

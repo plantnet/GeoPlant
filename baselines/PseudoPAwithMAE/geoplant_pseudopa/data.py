@@ -53,6 +53,7 @@ def split_frame(
 class SpeciesExample:
     survey_id: str
     x: torch.Tensor
+    loc: torch.Tensor
 
 
 class SpeciesSetDataset(Dataset[SpeciesExample]):
@@ -62,6 +63,8 @@ class SpeciesSetDataset(Dataset[SpeciesExample]):
             raise ValueError("SpeciesSetDataset requires a species_set column")
         self.frame["species_set"] = self.frame["species_set"].apply(parse_species_set)
         self.num_species = num_species
+        self.lat_column = "lat" if "lat" in self.frame.columns else "latitude" if "latitude" in self.frame.columns else None
+        self.lon_column = "lon" if "lon" in self.frame.columns else "longitude" if "longitude" in self.frame.columns else None
 
     def __len__(self) -> int:
         return len(self.frame)
@@ -72,7 +75,14 @@ class SpeciesSetDataset(Dataset[SpeciesExample]):
         species = row["species_set"]
         if species:
             vector[list(species)] = 1.0
+        location = torch.zeros(2, dtype=torch.float32)
+        if self.lat_column is not None and self.lon_column is not None:
+            lat_value = pd.to_numeric(row[self.lat_column], errors="coerce")
+            lon_value = pd.to_numeric(row[self.lon_column], errors="coerce")
+            if pd.notna(lat_value) and pd.notna(lon_value):
+                location = torch.tensor([float(lat_value), float(lon_value)], dtype=torch.float32)
         return {
             "survey_id": str(row.get("survey_id", index)),
             "x": vector,
+            "loc": location,
         }
