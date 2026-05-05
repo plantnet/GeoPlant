@@ -21,6 +21,7 @@ def test_collect_requested_files_defaults_metadata_to_both_sources():
     assert "PresenceOnlyOccurrences/PO_metadata_train.csv" in files
     assert "PresenceAbsenceSurveys/PA_metadata_train.csv" in files
     assert "PresenceAbsenceSurveys/PA_metadata_test.csv" in files
+    assert "PresenceAbsenceSurveys/test_labels.csv" in files
 
 
 def test_collect_requested_files_for_presence_absence_climate_csvs():
