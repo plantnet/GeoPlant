@@ -136,6 +136,7 @@ METADATA = {
     "pa": [
         "PresenceAbsenceSurveys/PA_metadata_test.csv",
         "PresenceAbsenceSurveys/PA_metadata_train.csv",
+        "PresenceAbsenceSurveys/test_labels.csv",
     ],
 }
 
