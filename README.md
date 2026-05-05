@@ -44,12 +44,10 @@ It integrates expert-verified species observations with rich environmental predi
 ---
 
 ## 🔀 Active Branches
-| Branch                       | What’s inside                                                                                 |
-|------------------------------|-----------------------------------------------------------------------------------------------|
-| `picekl/xgboost-baselines`   | XGBoost tabular baselines + ablations (location, climate, soil, land cover, human footprint). |
-| `picekl/MME-baselines`       | Multimodal ensemble (Sentinel-2, Landsat, climate) notebooks + training scripts.              |
-| `picekl/initial-experiemnts` | Initial experiments, dataset preprocessing etc.                                               |
-| `docs`                       | Sources for the website documentation.                                                        |
+| Branch                     | What’s inside                                                                                 |
+|----------------------------|-----------------------------------------------------------------------------------------------| |
+| `dev`                      | Refactoring and better accessibility.                                              |
+| `docs`                     | Sources for the website documentation.                                                        |
 
 ```bash
 # Example: switch to a baseline branch
