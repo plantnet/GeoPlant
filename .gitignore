@@ -1,11 +1,22 @@
 *.idea/
 
-data
-metadata
-resources
+env/
+.venv/
+
+data/
+dataset/data/
+
+metadata/
+resources/
+
+site/
+submissions/
+
 ecodatacube-extraction/patches_rgbi_glc
 __pycache__/
 
 *.csv
 
 .DS_Store
+__pycache__/
+.pytest_cache/
