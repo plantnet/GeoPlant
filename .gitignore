@@ -1,7 +1,4 @@
-.DS_Store
-.idea/
-__pycache__/
-.pytest_cache/
+*.idea/
 
 env/
 .venv/
@@ -9,5 +6,17 @@ env/
 data/
 dataset/data/
 
+metadata/
+resources/
+
 site/
 submissions/
+
+ecodatacube-extraction/patches_rgbi_glc
+__pycache__/
+
+*.csv
+
+.DS_Store
+__pycache__/
+.pytest_cache/
