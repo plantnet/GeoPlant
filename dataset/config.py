@@ -1,6 +1,7 @@
 """Static manifest for the GeoPlant dataset downloader."""
 
 VARIABLES = [
+    "biogeographicalregions",
     "climate",
     "elevation",
     "humanfootprint",
@@ -11,35 +12,57 @@ VARIABLES = [
 ]
 
 RASTERS = {
-    "climate": "EnvironmentalRasters/Climate.zip",
-    "elevation": "EnvironmentalRasters/Elevation.zip",
-    "humanfootprint": "EnvironmentalRasters/HumanFootprint.zip",
-    "landcover": "EnvironmentalRasters/LandCover.zip",
-    "soilgrids": "EnvironmentalRasters/Soilgrids.zip",
+    "biogeographicalregions": [
+        "EnvironmentalRasters/BiogeographicalRegions/Bioregions-Europe-2016-v1.geojson",
+    ],
+    "climate": [
+        "EnvironmentalRasters/Climate/BioClimatic_Average_1981-2010.zip",
+        "EnvironmentalRasters/Climate/Climatic_Monthly_1979-2019.zip",
+    ],
+    "elevation": [
+        "EnvironmentalRasters/Elevation/ASTER_Elevation.tif",
+    ],
+    "humanfootprint": [
+        "EnvironmentalRasters/HumanFootprint/v2/OSM_detailed.zip",
+    ],
+    "landcover": [
+        "EnvironmentalRasters/LandCover/LandCover_MODIS_Terra-Aqua_500m.tif",
+    ],
+    "soilgrids": [
+        "EnvironmentalRasters/Soilgrids/soilgrids.zip",
+    ],
+}
+
+LEGACY_RASTERS = {
+    "humanfootprint": [
+        "EnvironmentalRasters/HumanFootprint/v1/summarized.zip",
+        "EnvironmentalRasters/HumanFootprint/v1/detailed.zip",
+    ],
 }
 
 PRESENCE_ONLY = {
     "climate": {
         "csvs": [
-            "EnvironmentalRasters/Climate/PO-train-bioclimatic-average.csv",
-            "EnvironmentalRasters/Climate/PO-train-bioclimatic-monthly.csv",
+            "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
         ],
         "cubes": [
-            "EnvironmentalRasters/Climate/PO-train-bioclimatic-average.csv",
-            "EnvironmentalRasters/Climate/Climatic_Monthly_2000-2019_cubes/PO-train-bioclimatic-monthly.zip",
+            "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
+            "BioclimTimeSeries/cubes/PO-train-bioclimatic-monthly.zip",
         ],
     },
     "elevation": {
-        "csvs": ["EnvironmentalRasters/Elevation/PO-train-elevation.csv"],
+        "csvs": ["EnvironmentalValues/Elevation/PO-train-elevation.csv"],
     },
     "humanfootprint": {
-        "csvs": ["EnvironmentalRasters/HumanFootprint/PO-train-human-footprint.csv"],
+        "csvs": ["EnvironmentalValues/HumanFootprint/v2/PO-train-human_footprint.csv"],
+        "legacy_csvs": ["EnvironmentalValues/HumanFootprint/v1/PO-train-human-footprint.csv"],
     },
     "landcover": {
-        "csvs": ["EnvironmentalRasters/LandCover/PO-train-landcover.csv"],
+        "csvs": ["EnvironmentalValues/LandCover/PO-train-landcover.csv"],
     },
     "soilgrids": {
-        "csvs": ["EnvironmentalRasters/Soilgrids/PO-train-soilgrids.csv"],
+        "csvs": ["EnvironmentalValues/SoilGrids/v2/PO-train-soilgrids.csv"],
+        "legacy_csvs": ["EnvironmentalValues/SoilGrids/v1/PO-train-soilgrids.csv"],
     },
     "satellitepatches": {
         "csvs": [
@@ -65,38 +88,58 @@ PRESENCE_ONLY = {
 PRESENCE_ABSENCE = {
     "climate": {
         "csvs": [
-            "BioclimTimeSeries/values/PA-test-bioclimatic-average.csv",
-            "BioclimTimeSeries/values/PA-test-bioclimatic-monthly.csv",
-            "BioclimTimeSeries/values/PA-train-bioclimatic-average.csv",
-            "BioclimTimeSeries/values/PA-train-bioclimatic-monthly.csv",
+            "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
+            "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
+            "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
+            "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
         ],
         "cubes": [
-            "BioclimTimeSeries/cubes/PA-test-bioclimatic-monthly.zip",
+            "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
+            "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
+            "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
+            "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
             "BioclimTimeSeries/cubes/PA-train-bioclimatic-monthly.zip",
+            "BioclimTimeSeries/cubes/PA-test-bioclimatic-monthly.zip",
         ],
     },
     "elevation": {
         "csvs": [
-            "EnvironmentalRasters/Elevation/PA-train-elevation.csv",
-            "EnvironmentalRasters/Elevation/PA-test-elevation.csv",
+            "EnvironmentalValues/Elevation/PA-train-elevation.csv",
+            "EnvironmentalValues/Elevation/PA-test-iid-elevation.csv",
+            "EnvironmentalValues/Elevation/PA-test-ood-elevation.csv",
+            "EnvironmentalValues/Elevation/PA-test-glc25-elevation.csv",
         ],
     },
     "humanfootprint": {
         "csvs": [
-            "EnvironmentalRasters/HumanFootprint/PA-train-human-footprint.csv",
-            "EnvironmentalRasters/HumanFootprint/PA-test-human-footprint.csv",
+            "EnvironmentalValues/HumanFootprint/v2/PA-train-human_footprint.csv",
+            "EnvironmentalValues/HumanFootprint/v2/PA-test-human_footprint.csv",
+            "EnvironmentalValues/HumanFootprint/v2/PA-test-ood-human_footprint.csv",
+            "EnvironmentalValues/HumanFootprint/v2/PA-test-glc25-human_footprint.csv",
+        ],
+        "legacy_csvs": [
+            "EnvironmentalValues/HumanFootprint/v1/PA-train-human-footprint.csv",
+            "EnvironmentalValues/HumanFootprint/v1/PA-test-human-footprint.csv",
         ],
     },
     "landcover": {
         "csvs": [
-            "EnvironmentalRasters/LandCover/PA-train-landcover.csv",
-            "EnvironmentalRasters/LandCover/PA-test-landcover.csv",
+            "EnvironmentalValues/LandCover/PA-train-landcover.csv",
+            "EnvironmentalValues/LandCover/PA-test-iid-landcover.csv",
+            "EnvironmentalValues/LandCover/PA-test-ood-landcover.csv",
+            "EnvironmentalValues/LandCover/PA-test-glc25-landcover.csv",
         ],
     },
     "soilgrids": {
         "csvs": [
-            "EnvironmentalRasters/Soilgrids/PA-train-soilgrids.csv",
-            "EnvironmentalRasters/Soilgrids/PA-test-soilgrids.csv",
+            "EnvironmentalValues/SoilGrids/v2/PA-train-soilgrids.csv",
+            "EnvironmentalValues/SoilGrids/v2/PA-test-iid-soilgrids.csv",
+            "EnvironmentalValues/SoilGrids/v2/PA-test-ood-soilgrids.csv",
+            "EnvironmentalValues/SoilGrids/v2/PA-test-glc25-soilgrids.csv",
+        ],
+        "legacy_csvs": [
+            "EnvironmentalValues/SoilGrids/v1/PA-train-soilgrids.csv",
+            "EnvironmentalValues/SoilGrids/v1/PA-test-soilgrids.csv",
         ],
     },
     "satellitepatches": {
@@ -134,9 +177,13 @@ METADATA = {
         "PresenceOnlyOccurrences/PO_metadata_train.csv",
     ],
     "pa": [
-        "PresenceAbsenceSurveys/PA_metadata_test.csv",
         "PresenceAbsenceSurveys/PA_metadata_train.csv",
-        "PresenceAbsenceSurveys/test_labels.csv",
+        "PresenceAbsenceSurveys/PA_metadata_test_iid.csv",
+        "PresenceAbsenceSurveys/PA_metadata_test_ood.csv",
+        "PresenceAbsenceSurveys/PA_metadata_test_glc25.csv",
+        "PresenceAbsenceSurveys/test_labels_iid.csv",
+        "PresenceAbsenceSurveys/test_labels_ood.csv",
+        "PresenceAbsenceSurveys/test_labels_glc25.csv",
     ],
 }
 
