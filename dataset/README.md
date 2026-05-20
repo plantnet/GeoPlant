@@ -1,6 +1,6 @@
 # GeoPlant Dataset Downloader
 
-Download selected GeoPlant metadata, rasters, and pre-extracted modalities without fetching the full dataset archive.
+Download GeoPlant files by storage category without fetching the full dataset.
 
 ## Install
 
@@ -15,119 +15,117 @@ uv sync --group dev
 uv run pytest dataset/tests -q
 ```
 
-## Usage
+## CLI
 
-Run from the repository root:
+Use one or more data categories:
 
-```bash
-python -m dataset.data_download --metadata --presence-absence --data ./data
+```text
+--metadata
+--environmental-values
+--bioclim-values
+--bioclim-cubes
+--landsat-values
+--landsat-cubes
+--satellite-data
+--rasters
 ```
 
-Or use the Python API:
+Useful filters:
+
+```text
+--source po|pa|both          default: both
+--variables elevation soilgrids
+--modalities alphaearth sentinel2-tiff sentinel2-jpeg
+--legacy
+--extract
+```
+
+Category defaults download everything inside that category. Filters narrow it.
+
+## Examples
+
+All tabular `EnvironmentalValues`:
+
+```bash
+uv run python -m dataset.data_download \
+  --environmental-values \
+  --source both \
+  --data ./data
+```
+
+Only PA elevation values:
+
+```bash
+uv run python -m dataset.data_download \
+  --environmental-values \
+  --source pa \
+  --variables elevation \
+  --data ./data
+```
+
+Bioclim time-series values:
+
+```bash
+uv run python -m dataset.data_download \
+  --bioclim-values \
+  --source both \
+  --data ./data
+```
+
+Bioclim cubes, PA only, extracted after download:
+
+```bash
+uv run python -m dataset.data_download \
+  --bioclim-cubes \
+  --source pa \
+  --extract \
+  --data ./data
+```
+
+Landsat cubes, PO only:
+
+```bash
+uv run python -m dataset.data_download \
+  --landsat-cubes \
+  --source po \
+  --data ./data
+```
+
+PA AlphaEarth only:
+
+```bash
+uv run python -m dataset.data_download \
+  --satellite-data \
+  --source pa \
+  --modalities alphaearth \
+  --data ./data
+```
+
+Climate rasters only:
+
+```bash
+uv run python -m dataset.data_download \
+  --rasters \
+  --variables climate \
+  --data ./data
+```
+
+## Python API
 
 ```python
 from dataset import GeoPlant
 
 gp = GeoPlant(root="data")
-gp.download(metadata="pa")
-gp.download(source="pa", variables="climate")
-gp.download(source="pa", variables="climate", cubes=True, extract=True)
-gp.download(rasters=True, variables="humanfootprint")
-gp.download(rasters=True, variables="humanfootprint", legacy=True)
-```
-
-The downloader supports:
-
-```text
-Data types:
-  --metadata
-  --rasters
-  --pre-extracted, --ready-to-use
-  --cube               Download cube archives instead of CSV values when available
-  --extract            Extract selected zip archives after all required files download
-  --legacy            Download legacy raster/value files instead of the current default
-```
-
-```text
-Data sources:
-  --presence-only
-  --presence-absence
-```
-
-If no source is selected for `--metadata`, both PO and PA metadata are downloaded.
-PA metadata includes the train file plus the explicit IID, OOD, and combined
-GLC25 test files. The test labels are carried by those split files, so the
-downloader does not request separate `test_labels*.csv` files.
-
-For `--pre-extracted`, you must also select one or more variables:
-
-```text
-Variables:
-  --biogeographicalregions
-  --climate
-  --elevation
-  --humanfootprint
-  --landcover
-  --soilgrids
-  --satellitedata
-  --satellitetimeseries
-  --all-variables
-```
-
-`--satellitedata` resolves files under `SatelliteData/`: Sentinel-2 JPEG
-archives, Sentinel-2 TIFF archives, and AlphaEarth Parquet files.
-Use `--sentinel2-jpeg`, `--sentinel2-tiff`, or `--alphaearth` to limit
-satellite downloads to one or more modalities.
-
-## Examples
-
-Download all metadata:
-
-```bash
-python -m dataset.data_download --metadata --data ./data
-```
-
-Download PA Bioclim time-series values:
-
-```bash
-python -m dataset.data_download \
-  --pre-extracted \
-  --presence-absence \
-  --climate \
-  --data ./data
-```
-
-Download PO Landsat time-series cubes:
-
-```bash
-python -m dataset.data_download \
-  --ready-to-use \
-  --presence-only \
-  --satellitetimeseries \
-  --cube \
-  --data ./data
-```
-
-Download all raster layers that exist:
-
-```bash
-python -m dataset.data_download --rasters --all-variables --data ./data
-```
-
-Download PA AlphaEarth only:
-
-```bash
-python -m dataset.data_download \
-  --ready-to-use \
-  --presence-absence \
-  --satellitedata \
-  --alphaearth \
-  --data ./data
+gp.download(environmental_values=True, source="both")
+gp.download(environmental_values=True, source="pa", variables="elevation")
+gp.download(bioclim_cubes=True, source="pa", extract=True)
+gp.download(satellite_data=True, source="pa", satellite_modalities="alphaearth")
+gp.download(rasters=True, variables="climate")
 ```
 
 ## Notes
 
-- The downloader talks directly to the GeoPlant Seafile host and preserves the published folder structure under your `--data` directory.
-- Not every variable has both CSV and cube variants.
-- Multipart archive datasets should be listed as nested file groups in `config.py`; extraction waits until every file in the group has downloaded.
-- If any requested download fails, the command exits non-zero.
+- Downloaded files keep the published Seafile folder structure under `--data`.
+- `--environmental-values` means files under `EnvironmentalValues/`.
+- Bioclim and Landsat time-series have their own categories.
+- `--legacy` affects rasters and environmental values where legacy files exist.

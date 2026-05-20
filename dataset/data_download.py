@@ -23,6 +23,8 @@ ManifestEntry: TypeAlias = str | list[str]
 FileGroups: TypeAlias = list[list[str]]
 SatelliteModality: TypeAlias = str
 SATELLITE_MODALITIES = ("sentinel2_jpeg", "sentinel2_tiff", "alphaearth")
+ENVIRONMENTAL_VALUE_VARIABLES = ("elevation", "humanfootprint", "landcover", "soilgrids")
+RASTER_VARIABLES = tuple(RASTERS)
 
 
 @dataclass(frozen=True)
@@ -356,106 +358,96 @@ def raster_file_groups_for_variable(variable: str, legacy: bool = False) -> File
     return file_groups_from_entries(RASTERS.get(variable, []))
 
 
-def selected_legacy(args: argparse.Namespace) -> bool:
-    """Return whether legacy files were requested."""
-    return bool(getattr(args, "legacy", False) or getattr(args, "legacy_rasters", False))
-
-
-def selected_variables(args: argparse.Namespace) -> list[str]:
-    """Return variables requested on the CLI."""
-    if args.all_variables:
-        return list(VARIABLES)
-    return [variable for variable in VARIABLES if getattr(args, variable)]
-
-
-def selected_sources(args: argparse.Namespace) -> list[str]:
-    """Return requested source subsets using `po`/`pa` keys."""
-    if args.presence_only and args.presence_absence:
+def selected_sources(source: str) -> list[str]:
+    """Return source subset keys."""
+    if source == "both":
         return ["po", "pa"]
-    if args.presence_only:
-        return ["po"]
-    if args.presence_absence:
-        return ["pa"]
-    return ["po", "pa"]
+    return [source]
+
+
+def selected_variables(selection: list[str] | None, allowed: tuple[str, ...]) -> list[str]:
+    """Return selected variables, defaulting to every allowed variable."""
+    if not selection:
+        return list(allowed)
+    unknown = sorted(set(selection).difference(allowed))
+    if unknown:
+        raise ValueError(f"Unsupported variables for this data type: {unknown}")
+    return list(selection)
+
+
+def selected_satellite_modalities_from_names(modalities: list[str] | None) -> list[SatelliteModality]:
+    """Normalize selected satellite data modalities."""
+    if not modalities:
+        return list(SATELLITE_MODALITIES)
+    normalized = [modality.replace("-", "_") for modality in modalities]
+    unknown = sorted(set(normalized).difference(SATELLITE_MODALITIES))
+    if unknown:
+        raise ValueError(f"Unknown satellite modalities: {unknown}")
+    return normalized
 
 
 def build_download_args(
     *,
     metadata: bool = False,
     rasters: bool = False,
-    pre_extracted: bool = False,
-    cube: bool = False,
+    environmental_values: bool = False,
+    bioclim_values: bool = False,
+    bioclim_cubes: bool = False,
+    landsat_values: bool = False,
+    landsat_cubes: bool = False,
+    satellite_data: bool = False,
     legacy: bool = False,
-    legacy_rasters: bool = False,
-    sources: list[str] | None = None,
+    source: str = "both",
     variables: list[str] | None = None,
     satellite_modalities: list[str] | None = None,
 ) -> argparse.Namespace:
-    """Build an ``argparse.Namespace`` from Python API selections.
-
-    The existing downloader resolution code expects parser-style attributes.
-    This helper lets non-CLI callers reuse that code without duplicating the
-    manifest traversal logic.
-    """
-    selected_sources = sources or []
-    selected_variables = variables or []
-    unknown_sources = sorted(set(selected_sources).difference({"po", "pa"}))
-    if unknown_sources:
-        raise ValueError(f"Unknown sources: {unknown_sources}")
-    unknown_variables = sorted(set(selected_variables).difference(VARIABLES))
-    if unknown_variables:
-        raise ValueError(f"Unknown variables: {unknown_variables}")
-    selected_satellite_modalities = [
-        modality.replace("-", "_") for modality in (satellite_modalities or [])
-    ]
-    unknown_satellite_modalities = sorted(set(selected_satellite_modalities).difference(SATELLITE_MODALITIES))
-    if unknown_satellite_modalities:
-        raise ValueError(f"Unknown satellite modalities: {unknown_satellite_modalities}")
-
-    args = argparse.Namespace(
+    """Build an ``argparse.Namespace`` from Python API selections."""
+    if source not in {"po", "pa", "both"}:
+        raise ValueError(f"Unknown source: {source}")
+    selected_satellite_modalities_from_names(satellite_modalities)
+    return argparse.Namespace(
         metadata=metadata,
         rasters=rasters,
-        pre_extracted=pre_extracted,
-        cube=cube,
-        legacy=legacy or legacy_rasters,
-        presence_only="po" in selected_sources,
-        presence_absence="pa" in selected_sources,
-        all_variables=selected_variables == list(VARIABLES),
-        sentinel2_jpeg="sentinel2_jpeg" in selected_satellite_modalities,
-        sentinel2_tiff="sentinel2_tiff" in selected_satellite_modalities,
-        alphaearth="alphaearth" in selected_satellite_modalities,
+        environmental_values=environmental_values,
+        bioclim_values=bioclim_values,
+        bioclim_cubes=bioclim_cubes,
+        landsat_values=landsat_values,
+        landsat_cubes=landsat_cubes,
+        satellite_data=satellite_data,
+        legacy=legacy,
+        source=source,
+        variables=variables,
+        satellite_modalities=satellite_modalities,
     )
-    for variable in VARIABLES:
-        setattr(args, variable, variable in selected_variables)
-    return args
 
 
 def resolve_requested_files(
     *,
     metadata: bool = False,
     rasters: bool = False,
-    pre_extracted: bool = False,
-    cube: bool = False,
+    environmental_values: bool = False,
+    bioclim_values: bool = False,
+    bioclim_cubes: bool = False,
+    landsat_values: bool = False,
+    landsat_cubes: bool = False,
+    satellite_data: bool = False,
     legacy: bool = False,
-    legacy_rasters: bool = False,
-    sources: list[str] | None = None,
+    source: str = "both",
     variables: list[str] | None = None,
     satellite_modalities: list[str] | None = None,
 ) -> list[str]:
-    """Resolve manifest paths for a requested GeoPlant data subset.
-
-    Parameters mirror the CLI flags: choose one or more data types, optional
-    source subsets, optional variables, and whether cube archives should be
-    preferred when available.
-    """
+    """Resolve manifest paths for a requested GeoPlant data subset."""
     args = build_download_args(
         metadata=metadata,
         rasters=rasters,
-        pre_extracted=pre_extracted,
-        cube=cube,
+        environmental_values=environmental_values,
+        bioclim_values=bioclim_values,
+        bioclim_cubes=bioclim_cubes,
+        landsat_values=landsat_values,
+        landsat_cubes=landsat_cubes,
+        satellite_data=satellite_data,
         legacy=legacy,
-        legacy_rasters=legacy_rasters,
-        sources=sources,
+        source=source,
         variables=variables,
         satellite_modalities=satellite_modalities,
     )
@@ -466,11 +458,14 @@ def resolve_requested_file_groups(
     *,
     metadata: bool = False,
     rasters: bool = False,
-    pre_extracted: bool = False,
-    cube: bool = False,
+    environmental_values: bool = False,
+    bioclim_values: bool = False,
+    bioclim_cubes: bool = False,
+    landsat_values: bool = False,
+    landsat_cubes: bool = False,
+    satellite_data: bool = False,
     legacy: bool = False,
-    legacy_rasters: bool = False,
-    sources: list[str] | None = None,
+    source: str = "both",
     variables: list[str] | None = None,
     satellite_modalities: list[str] | None = None,
 ) -> FileGroups:
@@ -478,11 +473,14 @@ def resolve_requested_file_groups(
     args = build_download_args(
         metadata=metadata,
         rasters=rasters,
-        pre_extracted=pre_extracted,
-        cube=cube,
+        environmental_values=environmental_values,
+        bioclim_values=bioclim_values,
+        bioclim_cubes=bioclim_cubes,
+        landsat_values=landsat_values,
+        landsat_cubes=landsat_cubes,
+        satellite_data=satellite_data,
         legacy=legacy,
-        legacy_rasters=legacy_rasters,
-        sources=sources,
+        source=source,
         variables=variables,
         satellite_modalities=satellite_modalities,
     )
@@ -497,34 +495,50 @@ def collect_requested_files(args: argparse.Namespace) -> list[str]:
 def collect_requested_file_groups(args: argparse.Namespace) -> FileGroups:
     """Resolve requested file groups without downloading them."""
     requested_file_groups: FileGroups = []
-    legacy = selected_legacy(args)
+    source_names = selected_sources(args.source)
 
     if args.metadata:
-        for source_name in selected_sources(args):
+        for source_name in source_names:
             requested_file_groups.extend(file_groups_from_entries(METADATA[source_name]))
 
     if args.rasters:
-        for variable in selected_variables(args):
-            requested_file_groups.extend(
-                raster_file_groups_for_variable(variable, legacy)
-            )
+        for variable in selected_variables(args.variables, RASTER_VARIABLES):
+            requested_file_groups.extend(raster_file_groups_for_variable(variable, args.legacy))
 
-    if args.pre_extracted:
-        variables_to_download = selected_variables(args)
-        if not variables_to_download:
-            raise ValueError("`--pre-extracted` requires at least one variable flag or `--all-variables`.")
-        source_names = selected_sources(args)
-        for variable in variables_to_download:
-            if "po" in source_names:
-                file_groups = file_groups_for_variable(PRESENCE_ONLY, args.cube, variable, legacy)
-                if variable == "satellitedata":
-                    file_groups = filter_satellite_file_groups(file_groups, selected_satellite_modalities(args))
-                requested_file_groups.extend(file_groups)
-            if "pa" in source_names:
-                file_groups = file_groups_for_variable(PRESENCE_ABSENCE, args.cube, variable, legacy)
-                if variable == "satellitedata":
-                    file_groups = filter_satellite_file_groups(file_groups, selected_satellite_modalities(args))
-                requested_file_groups.extend(file_groups)
+    if args.environmental_values:
+        for variable in selected_variables(args.variables, ENVIRONMENTAL_VALUE_VARIABLES):
+            for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
+                if source_name in source_names:
+                    requested_file_groups.extend(file_groups_for_variable(structure, False, variable, args.legacy))
+
+    if args.bioclim_values:
+        for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
+            if source_name in source_names:
+                requested_file_groups.extend(file_groups_for_variable(structure, False, "climate"))
+
+    if args.bioclim_cubes:
+        for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
+            if source_name in source_names:
+                requested_file_groups.extend(file_groups_for_variable(structure, True, "climate"))
+
+    if args.landsat_values:
+        for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
+            if source_name in source_names:
+                requested_file_groups.extend(file_groups_for_variable(structure, False, "satellitetimeseries"))
+
+    if args.landsat_cubes:
+        for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
+            if source_name in source_names:
+                requested_file_groups.extend(file_groups_for_variable(structure, True, "satellitetimeseries"))
+
+    if args.satellite_data:
+        modalities = selected_satellite_modalities_from_names(
+            getattr(args, "satellite_modalities", None) or getattr(args, "modalities", None)
+        )
+        for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
+            if source_name in source_names:
+                file_groups = file_groups_for_variable(structure, False, "satellitedata")
+                requested_file_groups.extend(filter_satellite_file_groups(file_groups, modalities))
 
     return deduplicate_file_groups(requested_file_groups)
 
@@ -534,8 +548,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "GeoPlant Dataset Downloader.\n"
-            "Download metadata, rasters, and pre-extracted GeoPlant modalities "
-            "for presence-only and/or presence-absence subsets."
+            "Download GeoPlant data by storage category."
         )
     )
     parser.add_argument(
@@ -544,28 +557,46 @@ def build_parser() -> argparse.ArgumentParser:
         help='Destination directory for downloaded files (default: "data").',
     )
 
-    data_group = parser.add_argument_group("Data type")
+    data_group = parser.add_argument_group("Data categories")
     data_group.add_argument(
         "--metadata",
         action="store_true",
-        help="Download metadata for the selected subsets. Defaults to both subsets if none is specified.",
+        help="Download source metadata.",
     )
     data_group.add_argument(
         "--rasters",
         action="store_true",
-        help="Download complete raster datasets for the selected variables.",
+        help="Download environmental raster layers. Use --variables to filter.",
     )
     data_group.add_argument(
-        "--pre-extracted",
-        "--ready-to-use",
-        dest="pre_extracted",
+        "--environmental-values",
         action="store_true",
-        help="Download ready-to-use files for the selected variables.",
+        help="Download tabular EnvironmentalValues files.",
     )
     data_group.add_argument(
-        "--cube",
+        "--bioclim-values",
         action="store_true",
-        help="Download cube files instead of CSV values when a cube version exists.",
+        help="Download Bioclim time-series value archives.",
+    )
+    data_group.add_argument(
+        "--bioclim-cubes",
+        action="store_true",
+        help="Download Bioclim time-series cube archives.",
+    )
+    data_group.add_argument(
+        "--landsat-values",
+        action="store_true",
+        help="Download Landsat time-series value archives.",
+    )
+    data_group.add_argument(
+        "--landsat-cubes",
+        action="store_true",
+        help="Download Landsat time-series cube archives.",
+    )
+    data_group.add_argument(
+        "--satellite-data",
+        action="store_true",
+        help="Download SatelliteData files. Use --modalities to filter.",
     )
     data_group.add_argument(
         "--extract",
@@ -574,54 +605,30 @@ def build_parser() -> argparse.ArgumentParser:
     )
     data_group.add_argument(
         "--legacy",
-        "--legacy-rasters",
-        dest="legacy",
         action="store_true",
-        help="Download legacy raster/value files instead of the current default when available.",
+        help="Use legacy files where available for rasters/environmental values.",
     )
 
-    source_group = parser.add_argument_group("Data sources")
-    source_group.add_argument(
-        "--presence-only",
-        action="store_true",
-        help="Select presence-only files.",
+    parser.add_argument(
+        "--source",
+        choices=("po", "pa", "both"),
+        default="both",
+        help="Select presence-only, presence-absence, or both subsets.",
     )
-    source_group.add_argument(
-        "--presence-absence",
-        action="store_true",
-        help="Select presence-absence files.",
+    parser.add_argument(
+        "--variables",
+        nargs="+",
+        choices=VARIABLES,
+        help=(
+            "Filter variables for --rasters or --environmental-values. "
+            "Defaults to every variable supported by the selected category."
+        ),
     )
-
-    variable_group = parser.add_argument_group("Variables")
-    for variable in VARIABLES:
-        variable_group.add_argument(
-            f"--{variable}",
-            action="store_true",
-            help=f'Download data related to "{variable}".',
-        )
-    variable_group.add_argument(
-        "--all-variables",
-        action="store_true",
-        help="Select all variables.",
-    )
-
-    satellite_group = parser.add_argument_group("Satellite data modalities")
-    satellite_group.add_argument(
-        "--sentinel2-jpeg",
-        dest="sentinel2_jpeg",
-        action="store_true",
-        help="When --satellitedata is selected, download only Sentinel-2 JPEG archives.",
-    )
-    satellite_group.add_argument(
-        "--sentinel2-tiff",
-        dest="sentinel2_tiff",
-        action="store_true",
-        help="When --satellitedata is selected, download only Sentinel-2 TIFF archives.",
-    )
-    satellite_group.add_argument(
-        "--alphaearth",
-        action="store_true",
-        help="When --satellitedata is selected, download only AlphaEarth Parquet files.",
+    parser.add_argument(
+        "--modalities",
+        nargs="+",
+        choices=("sentinel2-jpeg", "sentinel2-tiff", "alphaearth"),
+        help="Filter --satellite-data modalities. Defaults to all modalities.",
     )
     return parser
 
@@ -639,7 +646,10 @@ def main(argv: list[str] | None = None) -> int:
 
     requested_files = flatten_file_groups(requested_file_groups)
     if not requested_files:
-        parser.error("No files selected. Choose at least one of `--metadata`, `--rasters`, or `--pre-extracted`.")
+        parser.error(
+            "No files selected. Choose at least one data category such as "
+            "`--metadata`, `--environmental-values`, or `--bioclim-values`."
+        )
 
     results = download_files(requested_files, args.data)
     successful_files = {

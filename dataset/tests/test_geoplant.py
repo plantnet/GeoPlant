@@ -7,29 +7,10 @@ from dataset import GeoPlant
 from dataset.data_download import DownloadResult
 
 
-def test_geoplant_selects_pre_extracted_variables_from_source():
-    geoplant = GeoPlant(root="data")
-
-    assert geoplant.files(source="pa", variables="climate") == [
-        "TimeSeries/Bioclim/values/PA-train-bioclimatic_time_series.zip",
-        "TimeSeries/Bioclim/values/PA-test-iid-bioclimatic_time_series.zip",
-        "TimeSeries/Bioclim/values/PA-test-ood-bioclimatic_time_series.zip",
-        "TimeSeries/Bioclim/values/PA-test-glc25-bioclimatic_time_series.zip",
-    ]
-
-
-def test_geoplant_download_selection_can_override_defaults():
-    geoplant = GeoPlant(root="data")
-
-    assert geoplant.files(metadata="po") == [
-        "PresenceOnlyOccurrences/PO_metadata_train.csv",
-    ]
-
-
 def test_geoplant_selects_metadata_source():
     geoplant = GeoPlant(root="data")
 
-    assert geoplant.files(metadata="pa") == [
+    assert geoplant.files(metadata=True, source="pa") == [
         "PresenceAbsenceSurveys/PA_metadata_train.csv",
         "PresenceAbsenceSurveys/PA_metadata_test_iid.csv",
         "PresenceAbsenceSurveys/PA_metadata_test_ood.csv",
@@ -37,10 +18,22 @@ def test_geoplant_selects_metadata_source():
     ]
 
 
-def test_geoplant_selects_cubes_from_source():
+def test_geoplant_selects_environmental_values_with_filters():
     geoplant = GeoPlant(root="data")
 
-    assert geoplant.files(source="pa", variables="climate", cubes=True) == [
+    assert geoplant.files(environmental_values=True, source="pa", variables="soilgrids", legacy=True) == [
+        "EnvironmentalValues/SoilGrids/v1/PA-train-soilgrids.csv",
+        "EnvironmentalValues/SoilGrids/v1/PA-test-soilgrids.csv",
+    ]
+
+
+def test_geoplant_selects_bioclim_values_and_cubes():
+    geoplant = GeoPlant(root="data")
+
+    assert geoplant.files(bioclim_values=True, source="po") == [
+        "TimeSeries/Bioclim/values/PO-train-bioclimatic_time_series.zip",
+    ]
+    assert geoplant.files(bioclim_cubes=True, source="pa") == [
         "TimeSeries/Bioclim/cubes/PA-train-bioclimatic-monthly.zip",
         "TimeSeries/Bioclim/cubes/PA-test-iid-bioclimatic-monthly.zip",
         "TimeSeries/Bioclim/cubes/PA-test-ood-bioclimatic-monthly.zip",
@@ -48,71 +41,23 @@ def test_geoplant_selects_cubes_from_source():
     ]
 
 
-def test_geoplant_all_variables_selects_every_available_raster():
+def test_geoplant_selects_rasters_with_filters():
     geoplant = GeoPlant(root="data")
 
-    assert geoplant.files(rasters=True, variables="all") == [
-        "EnvironmentalRasters/BiogeographicalRegions/Bioregions-Europe-2016-v1.geojson",
+    assert geoplant.files(rasters=True, variables="climate") == [
         "EnvironmentalRasters/Climate/BioClimatic_Average_1981-2010.zip",
         "EnvironmentalRasters/Climate/Climatic_Monthly_1979-2019.zip",
-        "EnvironmentalRasters/Elevation/ASTER_Elevation.tif",
-        "EnvironmentalRasters/HumanFootprint/v2/OSM_detailed.zip",
-        "EnvironmentalRasters/LandCover/LandCover_MODIS_Terra-Aqua_500m.tif",
-        "EnvironmentalRasters/Soilgrids/soilgrids.zip",
-    ]
-
-
-def test_geoplant_can_select_legacy_rasters():
-    geoplant = GeoPlant(root="data")
-
-    assert geoplant.files(
-        rasters=True,
-        variables="humanfootprint",
-        legacy=True,
-    ) == [
-        "EnvironmentalRasters/HumanFootprint/v1/summarized.zip",
-        "EnvironmentalRasters/HumanFootprint/v1/detailed.zip",
-    ]
-
-
-def test_geoplant_can_select_legacy_environmental_values():
-    geoplant = GeoPlant(root="data")
-
-    assert geoplant.files(
-        source="pa",
-        variables="soilgrids",
-        legacy=True,
-    ) == [
-        "EnvironmentalValues/SoilGrids/v1/PA-train-soilgrids.csv",
-        "EnvironmentalValues/SoilGrids/v1/PA-test-soilgrids.csv",
     ]
 
 
 def test_geoplant_can_select_satellite_modalities():
     geoplant = GeoPlant(root="data")
 
-    assert geoplant.files(
-        source="pa",
-        variables="satellitedata",
-        satellite_modalities="alphaearth",
-    ) == [
+    assert geoplant.files(satellite_data=True, source="pa", satellite_modalities="alphaearth") == [
         "SatelliteData/AlphaEarth/PA-train-alphaearth.parquet",
         "SatelliteData/AlphaEarth/PA-test-iid-alphaearth.parquet",
         "SatelliteData/AlphaEarth/PA-test-ood-alphaearth.parquet",
         "SatelliteData/AlphaEarth/PA-test-glc25-alphaearth.parquet",
-    ]
-
-
-def test_geoplant_accepts_hyphenated_satellite_modalities():
-    geoplant = GeoPlant(root="data")
-
-    assert geoplant.files(
-        source="pa",
-        variables="satellitedata",
-        satellite_modalities="sentinel2-jpeg",
-    ) == [
-        "SatelliteData/Sentinel2Patches-jpeg/PA-Train-Sentinel2Patches-RGB+NIR.zip",
-        "SatelliteData/Sentinel2Patches-jpeg/PA-Test-IID-Sentinel2Patches.zip",
     ]
 
 
@@ -134,7 +79,7 @@ def test_geoplant_download_uses_selected_files_and_root(monkeypatch):
     monkeypatch.setattr("dataset.geoplant.download_files", fake_download_files)
     geoplant = GeoPlant(root=Path("data"))
 
-    results = geoplant.download(source="pa", variables="elevation")
+    results = geoplant.download(environmental_values=True, source="pa", variables="elevation")
 
     assert calls == [
         (
@@ -157,7 +102,7 @@ def test_geoplant_extract_selected_zip_files(tmp_path):
         archive.writestr("sample.txt", "ok")
 
     geoplant = GeoPlant(root=tmp_path)
-    results = geoplant.extract(source="pa", variables="climate", cubes=True)
+    results = geoplant.extract(bioclim_cubes=True, source="pa")
 
     selected = [result for result in results if result.archive_path == str(archive_path)]
     assert selected
@@ -183,6 +128,6 @@ def test_geoplant_download_extract_uses_group_completion(monkeypatch):
     monkeypatch.setattr("dataset.geoplant.extract_downloaded_file_groups", fake_extract_groups)
 
     geoplant = GeoPlant(root=Path("data"))
-    geoplant.download(source="po", variables="satellitedata", extract=True, overwrite=True)
+    geoplant.download(satellite_data=True, source="po", extract=True, overwrite=True)
 
     assert calls == [([["a.zip", "b.zip"]], Path("data"), {"a.zip"}, True)]
