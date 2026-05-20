@@ -9,6 +9,7 @@ import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TypeAlias
+from urllib.parse import quote
 
 import requests
 from tqdm import tqdm
@@ -20,6 +21,8 @@ except ImportError:  # pragma: no cover - supports direct script execution
 
 ManifestEntry: TypeAlias = str | list[str]
 FileGroups: TypeAlias = list[list[str]]
+SatelliteModality: TypeAlias = str
+SATELLITE_MODALITIES = ("sentinel2_jpeg", "sentinel2_tiff", "alphaearth")
 
 
 @dataclass(frozen=True)
@@ -72,7 +75,7 @@ class ExtractResult:
 
 def find_url(file_path: str) -> str:
     """Resolve a direct download URL from the published Seafile page."""
-    response = requests.get(URL_STRUCT.format(file_path), timeout=60)
+    response = requests.get(URL_STRUCT.format(quote(file_path, safe="/")), timeout=60)
     response.raise_for_status()
     match = re.search(r"rawPath: '([^']+)'", response.text)
     if match:
@@ -302,6 +305,44 @@ def file_groups_for_variable(
     return file_groups_from_entries(variable_entry.get("csvs", variable_entry.get("not_cubes", [])))
 
 
+def selected_satellite_modalities(args: argparse.Namespace) -> list[SatelliteModality]:
+    """Return selected satellite data modalities."""
+    selected = [
+        modality
+        for flag, modality in (
+            ("sentinel2_jpeg", "sentinel2_jpeg"),
+            ("sentinel2_tiff", "sentinel2_tiff"),
+            ("alphaearth", "alphaearth"),
+        )
+        if getattr(args, flag, False)
+    ]
+    return selected or list(SATELLITE_MODALITIES)
+
+
+def satellite_modality(file_path: str) -> SatelliteModality | None:
+    """Return the satellite modality for a manifest path."""
+    if "/Sentinel2Patches-jpeg/" in file_path:
+        return "sentinel2_jpeg"
+    if "/Sentinel2Patches-tiff/" in file_path:
+        return "sentinel2_tiff"
+    if "/AlphaEarth/" in file_path:
+        return "alphaearth"
+    return None
+
+
+def filter_satellite_file_groups(
+    file_groups: FileGroups,
+    modalities: list[SatelliteModality],
+) -> FileGroups:
+    """Keep only satellite data file groups matching selected modalities."""
+    allowed = set(modalities)
+    return [
+        file_group
+        for file_group in file_groups
+        if any(satellite_modality(file_path) in allowed for file_path in file_group)
+    ]
+
+
 def raster_file_groups_for_variable(variable: str, legacy: bool = False) -> FileGroups:
     """Return raster file groups for a variable.
 
@@ -348,6 +389,7 @@ def build_download_args(
     legacy_rasters: bool = False,
     sources: list[str] | None = None,
     variables: list[str] | None = None,
+    satellite_modalities: list[str] | None = None,
 ) -> argparse.Namespace:
     """Build an ``argparse.Namespace`` from Python API selections.
 
@@ -363,6 +405,12 @@ def build_download_args(
     unknown_variables = sorted(set(selected_variables).difference(VARIABLES))
     if unknown_variables:
         raise ValueError(f"Unknown variables: {unknown_variables}")
+    selected_satellite_modalities = [
+        modality.replace("-", "_") for modality in (satellite_modalities or [])
+    ]
+    unknown_satellite_modalities = sorted(set(selected_satellite_modalities).difference(SATELLITE_MODALITIES))
+    if unknown_satellite_modalities:
+        raise ValueError(f"Unknown satellite modalities: {unknown_satellite_modalities}")
 
     args = argparse.Namespace(
         metadata=metadata,
@@ -373,6 +421,9 @@ def build_download_args(
         presence_only="po" in selected_sources,
         presence_absence="pa" in selected_sources,
         all_variables=selected_variables == list(VARIABLES),
+        sentinel2_jpeg="sentinel2_jpeg" in selected_satellite_modalities,
+        sentinel2_tiff="sentinel2_tiff" in selected_satellite_modalities,
+        alphaearth="alphaearth" in selected_satellite_modalities,
     )
     for variable in VARIABLES:
         setattr(args, variable, variable in selected_variables)
@@ -389,6 +440,7 @@ def resolve_requested_files(
     legacy_rasters: bool = False,
     sources: list[str] | None = None,
     variables: list[str] | None = None,
+    satellite_modalities: list[str] | None = None,
 ) -> list[str]:
     """Resolve manifest paths for a requested GeoPlant data subset.
 
@@ -405,6 +457,7 @@ def resolve_requested_files(
         legacy_rasters=legacy_rasters,
         sources=sources,
         variables=variables,
+        satellite_modalities=satellite_modalities,
     )
     return collect_requested_files(args)
 
@@ -419,6 +472,7 @@ def resolve_requested_file_groups(
     legacy_rasters: bool = False,
     sources: list[str] | None = None,
     variables: list[str] | None = None,
+    satellite_modalities: list[str] | None = None,
 ) -> FileGroups:
     """Resolve extraction-aware manifest groups for a requested data subset."""
     args = build_download_args(
@@ -430,6 +484,7 @@ def resolve_requested_file_groups(
         legacy_rasters=legacy_rasters,
         sources=sources,
         variables=variables,
+        satellite_modalities=satellite_modalities,
     )
     return collect_requested_file_groups(args)
 
@@ -461,13 +516,15 @@ def collect_requested_file_groups(args: argparse.Namespace) -> FileGroups:
         source_names = selected_sources(args)
         for variable in variables_to_download:
             if "po" in source_names:
-                requested_file_groups.extend(
-                    file_groups_for_variable(PRESENCE_ONLY, args.cube, variable, legacy)
-                )
+                file_groups = file_groups_for_variable(PRESENCE_ONLY, args.cube, variable, legacy)
+                if variable == "satellitedata":
+                    file_groups = filter_satellite_file_groups(file_groups, selected_satellite_modalities(args))
+                requested_file_groups.extend(file_groups)
             if "pa" in source_names:
-                requested_file_groups.extend(
-                    file_groups_for_variable(PRESENCE_ABSENCE, args.cube, variable, legacy)
-                )
+                file_groups = file_groups_for_variable(PRESENCE_ABSENCE, args.cube, variable, legacy)
+                if variable == "satellitedata":
+                    file_groups = filter_satellite_file_groups(file_groups, selected_satellite_modalities(args))
+                requested_file_groups.extend(file_groups)
 
     return deduplicate_file_groups(requested_file_groups)
 
@@ -500,8 +557,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     data_group.add_argument(
         "--pre-extracted",
+        "--ready-to-use",
+        dest="pre_extracted",
         action="store_true",
-        help="Download pre-extracted values or cube archives for the selected variables.",
+        help="Download ready-to-use files for the selected variables.",
     )
     data_group.add_argument(
         "--cube",
@@ -544,6 +603,25 @@ def build_parser() -> argparse.ArgumentParser:
         "--all-variables",
         action="store_true",
         help="Select all variables.",
+    )
+
+    satellite_group = parser.add_argument_group("Satellite data modalities")
+    satellite_group.add_argument(
+        "--sentinel2-jpeg",
+        dest="sentinel2_jpeg",
+        action="store_true",
+        help="When --satellitedata is selected, download only Sentinel-2 JPEG archives.",
+    )
+    satellite_group.add_argument(
+        "--sentinel2-tiff",
+        dest="sentinel2_tiff",
+        action="store_true",
+        help="When --satellitedata is selected, download only Sentinel-2 TIFF archives.",
+    )
+    satellite_group.add_argument(
+        "--alphaearth",
+        action="store_true",
+        help="When --satellitedata is selected, download only AlphaEarth Parquet files.",
     )
     return parser
 

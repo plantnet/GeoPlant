@@ -23,11 +23,11 @@ def test_collect_requested_files_defaults_metadata_to_both_sources():
     assert "PresenceAbsenceSurveys/PA_metadata_test_iid.csv" in files
     assert "PresenceAbsenceSurveys/PA_metadata_test_ood.csv" in files
     assert "PresenceAbsenceSurveys/PA_metadata_test_glc25.csv" in files
-    assert "PresenceAbsenceSurveys/test_labels_iid.csv" in files
-    assert "PresenceAbsenceSurveys/test_labels_ood.csv" in files
-    assert "PresenceAbsenceSurveys/test_labels_glc25.csv" in files
     assert "PresenceAbsenceSurveys/PA_metadata_test.csv" not in files
     assert "PresenceAbsenceSurveys/test_labels.csv" not in files
+    assert "PresenceAbsenceSurveys/test_labels_iid.csv" not in files
+    assert "PresenceAbsenceSurveys/test_labels_ood.csv" not in files
+    assert "PresenceAbsenceSurveys/test_labels_glc25.csv" not in files
 
 
 def test_collect_requested_files_for_climate_rasters():
@@ -70,10 +70,10 @@ def test_collect_requested_files_for_presence_absence_climate_csvs():
     args = parser.parse_args(["--pre-extracted", "--presence-absence", "--climate"])
     files = collect_requested_files(args)
     assert files == [
-        "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
-        "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
-        "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
-        "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
+        "TimeSeries/Bioclim/values/PA-train-bioclimatic_time_series.zip",
+        "TimeSeries/Bioclim/values/PA-test-iid-bioclimatic_time_series.zip",
+        "TimeSeries/Bioclim/values/PA-test-ood-bioclimatic_time_series.zip",
+        "TimeSeries/Bioclim/values/PA-test-glc25-bioclimatic_time_series.zip",
     ]
 
 
@@ -145,6 +145,78 @@ def test_collect_requested_files_for_presence_only_values_use_environmental_valu
     ]
 
 
+def test_collect_requested_files_for_presence_only_satellite_data():
+    parser = build_parser()
+    args = parser.parse_args(["--pre-extracted", "--presence-only", "--satellitedata"])
+    files = collect_requested_files(args)
+    assert files[:2] == [
+        "SatelliteData/Sentinel2Patches-jpeg/PO-Train-Sentinel2Patches-NIR.zip",
+        "SatelliteData/Sentinel2Patches-jpeg/PO-Train-Sentinel2Patches-RGB.zip",
+    ]
+    assert files[2:26] == [
+        f"SatelliteData/Sentinel2Patches-tiff/PO-Train-Sentinel2Patches-part-{part:02d}.zip"
+        for part in range(24)
+    ]
+    assert files[26:] == ["SatelliteData/AlphaEarth/PO-train-alphaearth.parquet"]
+
+
+def test_collect_requested_files_for_presence_absence_satellite_data_uses_split_tiff_tests():
+    parser = build_parser()
+    args = parser.parse_args(["--pre-extracted", "--presence-absence", "--satellitedata"])
+    files = collect_requested_files(args)
+    assert files[:2] == [
+        "SatelliteData/Sentinel2Patches-jpeg/PA-Train-Sentinel2Patches-RGB+NIR.zip",
+        "SatelliteData/Sentinel2Patches-jpeg/PA-Test-IID-Sentinel2Patches.zip",
+    ]
+    assert files[2:] == [
+        "SatelliteData/Sentinel2Patches-tiff/PA-Train-Sentinel2Patches.zip",
+        "SatelliteData/Sentinel2Patches-tiff/PA-Test-IID-Sentinel2Patches.zip",
+        "SatelliteData/Sentinel2Patches-tiff/PA-Test-OOD-Sentinel2Patches.zip",
+        "SatelliteData/Sentinel2Patches-tiff/PA-Test-GLC25-Sentinel2Patches.zip",
+        "SatelliteData/AlphaEarth/PA-train-alphaearth.parquet",
+        "SatelliteData/AlphaEarth/PA-test-iid-alphaearth.parquet",
+        "SatelliteData/AlphaEarth/PA-test-ood-alphaearth.parquet",
+        "SatelliteData/AlphaEarth/PA-test-glc25-alphaearth.parquet",
+    ]
+
+
+def test_collect_requested_files_can_select_presence_absence_alphaearth_only():
+    parser = build_parser()
+    args = parser.parse_args(["--ready-to-use", "--presence-absence", "--satellitedata", "--alphaearth"])
+    files = collect_requested_files(args)
+    assert files == [
+        "SatelliteData/AlphaEarth/PA-train-alphaearth.parquet",
+        "SatelliteData/AlphaEarth/PA-test-iid-alphaearth.parquet",
+        "SatelliteData/AlphaEarth/PA-test-ood-alphaearth.parquet",
+        "SatelliteData/AlphaEarth/PA-test-glc25-alphaearth.parquet",
+    ]
+
+
+def test_collect_requested_files_can_select_presence_only_alphaearth_only():
+    parser = build_parser()
+    args = parser.parse_args(["--pre-extracted", "--presence-only", "--satellitedata", "--alphaearth"])
+    files = collect_requested_files(args)
+    assert files == ["SatelliteData/AlphaEarth/PO-train-alphaearth.parquet"]
+
+
+def test_collect_requested_files_can_select_satellite_modalities_together():
+    parser = build_parser()
+    args = parser.parse_args(
+        ["--pre-extracted", "--presence-absence", "--satellitedata", "--sentinel2-tiff", "--alphaearth"]
+    )
+    files = collect_requested_files(args)
+    assert files == [
+        "SatelliteData/Sentinel2Patches-tiff/PA-Train-Sentinel2Patches.zip",
+        "SatelliteData/Sentinel2Patches-tiff/PA-Test-IID-Sentinel2Patches.zip",
+        "SatelliteData/Sentinel2Patches-tiff/PA-Test-OOD-Sentinel2Patches.zip",
+        "SatelliteData/Sentinel2Patches-tiff/PA-Test-GLC25-Sentinel2Patches.zip",
+        "SatelliteData/AlphaEarth/PA-train-alphaearth.parquet",
+        "SatelliteData/AlphaEarth/PA-test-iid-alphaearth.parquet",
+        "SatelliteData/AlphaEarth/PA-test-ood-alphaearth.parquet",
+        "SatelliteData/AlphaEarth/PA-test-glc25-alphaearth.parquet",
+    ]
+
+
 def test_collect_requested_files_can_select_legacy_presence_only_values():
     parser = build_parser()
     args = parser.parse_args(
@@ -162,7 +234,7 @@ def test_collect_requested_files_for_presence_only_climate_monthly_uses_bioclim_
     args = parser.parse_args(["--pre-extracted", "--presence-only", "--climate"])
     files = collect_requested_files(args)
     assert files == [
-        "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
+        "TimeSeries/Bioclim/values/PO-train-bioclimatic_time_series.zip",
     ]
 
 
@@ -171,8 +243,35 @@ def test_collect_requested_files_for_presence_only_climate_cubes_uses_bioclim_ti
     args = parser.parse_args(["--pre-extracted", "--cube", "--presence-only", "--climate"])
     files = collect_requested_files(args)
     assert files == [
-        "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
-        "BioclimTimeSeries/cubes/PO-train-bioclimatic-monthly.zip",
+        "TimeSeries/Bioclim/cubes/PO-train-bioclimatic-monthly.zip",
+    ]
+
+
+def test_collect_requested_files_for_landsat_values_use_time_series_layout():
+    parser = build_parser()
+    args = parser.parse_args(["--pre-extracted", "--presence-only", "--presence-absence", "--satellitetimeseries"])
+    files = collect_requested_files(args)
+    assert files == [
+        "TimeSeries/Landsat/values/PO-train-landsat-time-series.zip",
+        "TimeSeries/Landsat/values/PA-train-landsat_time_series.zip",
+        "TimeSeries/Landsat/values/PA-test-iid-landsat_time_series.zip",
+        "TimeSeries/Landsat/values/PA-test-ood-landsat_time_series.zip",
+        "TimeSeries/Landsat/values/PA-test-glc25-landsat_time_series.zip",
+    ]
+
+
+def test_collect_requested_files_for_landsat_cubes_use_time_series_layout():
+    parser = build_parser()
+    args = parser.parse_args(
+        ["--pre-extracted", "--cube", "--presence-only", "--presence-absence", "--satellitetimeseries"]
+    )
+    files = collect_requested_files(args)
+    assert files == [
+        "TimeSeries/Landsat/cubes/PO-train-landsat-time-series.zip",
+        "TimeSeries/Landsat/cubes/PA-train-landsat-time-series.zip",
+        "TimeSeries/Landsat/cubes/PA-test-iid-landsat-time-series.zip",
+        "TimeSeries/Landsat/cubes/PA-test-ood-landsat-time-series.zip",
+        "TimeSeries/Landsat/cubes/PA-test-glc25-landsat-time-series.zip",
     ]
 
 

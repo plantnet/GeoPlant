@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geoplant"
+version = "0.1.0"
+description = "GeoPlant dataset downloader and access utilities."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+dependencies = [
+    "requests",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+preprocessing = [
+    "geopandas",
+    "pandas",
+    "pyarrow",
+    "reverse-geocoder",
+    "swifter",
+]
+notebook = [
+    "ipykernel",
+    "nbclient",
+    "nbformat",
+    "notebook",
+    "wandb",
+]
+test = [
+    "pytest",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
+
+[tool.setuptools.packages.find]
+include = ["dataset*"]

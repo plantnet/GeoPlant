@@ -7,8 +7,13 @@ VARIABLES = [
     "humanfootprint",
     "landcover",
     "soilgrids",
-    "satellitepatches",
+    "satellitedata",
     "satellitetimeseries",
+]
+
+PO_SENTINEL2_TIFF_PARTS = [
+    f"SatelliteData/Sentinel2Patches-tiff/PO-Train-Sentinel2Patches-part-{part:02d}.zip"
+    for part in range(24)
 ]
 
 RASTERS = {
@@ -43,11 +48,10 @@ LEGACY_RASTERS = {
 PRESENCE_ONLY = {
     "climate": {
         "csvs": [
-            "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
+            "TimeSeries/Bioclim/values/PO-train-bioclimatic_time_series.zip",
         ],
         "cubes": [
-            "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
-            "BioclimTimeSeries/cubes/PO-train-bioclimatic-monthly.zip",
+            "TimeSeries/Bioclim/cubes/PO-train-bioclimatic-monthly.zip",
         ],
     },
     "elevation": {
@@ -64,23 +68,20 @@ PRESENCE_ONLY = {
         "csvs": ["EnvironmentalValues/SoilGrids/v2/PO-train-soilgrids.csv"],
         "legacy_csvs": ["EnvironmentalValues/SoilGrids/v1/PO-train-soilgrids.csv"],
     },
-    "satellitepatches": {
+    "satellitedata": {
         "csvs": [
-            "SatellitePatches/PO-Train-SatellitePatches-NIR.zip",
-            "SatellitePatches/PO-Train-SatellitePatches-RGB.zip",
+            "SatelliteData/Sentinel2Patches-jpeg/PO-Train-Sentinel2Patches-NIR.zip",
+            "SatelliteData/Sentinel2Patches-jpeg/PO-Train-Sentinel2Patches-RGB.zip",
+            PO_SENTINEL2_TIFF_PARTS,
+            "SatelliteData/AlphaEarth/PO-train-alphaearth.parquet",
         ],
     },
     "satellitetimeseries": {
         "csvs": [
-            "SatelliteTimeSeries/PO-train-landsat-time-series-swir2.csv",
-            "SatelliteTimeSeries/PO-train-landsat-time-series-swir1.csv",
-            "SatelliteTimeSeries/PO-train-landsat-time-series-red.csv",
-            "SatelliteTimeSeries/PO-train-landsat-time-series-nir.csv",
-            "SatelliteTimeSeries/PO-train-landsat-time-series-green.csv",
-            "SatelliteTimeSeries/PO-train-landsat-time-series-blue.csv",
+            "TimeSeries/Landsat/values/PO-train-landsat-time-series.zip",
         ],
         "cubes": [
-            "SatelliteTimeSeries/cubes/PO-train-landsat-time-series.zip",
+            "TimeSeries/Landsat/cubes/PO-train-landsat-time-series.zip",
         ],
     },
 }
@@ -88,18 +89,16 @@ PRESENCE_ONLY = {
 PRESENCE_ABSENCE = {
     "climate": {
         "csvs": [
-            "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
-            "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
-            "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
-            "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
+            "TimeSeries/Bioclim/values/PA-train-bioclimatic_time_series.zip",
+            "TimeSeries/Bioclim/values/PA-test-iid-bioclimatic_time_series.zip",
+            "TimeSeries/Bioclim/values/PA-test-ood-bioclimatic_time_series.zip",
+            "TimeSeries/Bioclim/values/PA-test-glc25-bioclimatic_time_series.zip",
         ],
         "cubes": [
-            "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
-            "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
-            "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
-            "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
-            "BioclimTimeSeries/cubes/PA-train-bioclimatic-monthly.zip",
-            "BioclimTimeSeries/cubes/PA-test-bioclimatic-monthly.zip",
+            "TimeSeries/Bioclim/cubes/PA-train-bioclimatic-monthly.zip",
+            "TimeSeries/Bioclim/cubes/PA-test-iid-bioclimatic-monthly.zip",
+            "TimeSeries/Bioclim/cubes/PA-test-ood-bioclimatic-monthly.zip",
+            "TimeSeries/Bioclim/cubes/PA-test-glc25-bioclimatic-monthly.zip",
         ],
     },
     "elevation": {
@@ -142,32 +141,32 @@ PRESENCE_ABSENCE = {
             "EnvironmentalValues/SoilGrids/v1/PA-test-soilgrids.csv",
         ],
     },
-    "satellitepatches": {
+    "satellitedata": {
         "csvs": [
-            "SatellitePatches/PA-Train-SatellitePatches-NIR.zip",
-            "SatellitePatches/PA-Train-SatellitePatches-RGB.zip",
-            "SatellitePatches/PA-Test-SatellitePatches-NIR.zip",
-            "SatellitePatches/PA-Test-SatellitePatches-RGB.zip",
+            "SatelliteData/Sentinel2Patches-jpeg/PA-Train-Sentinel2Patches-RGB+NIR.zip",
+            "SatelliteData/Sentinel2Patches-jpeg/PA-Test-IID-Sentinel2Patches.zip",
+            "SatelliteData/Sentinel2Patches-tiff/PA-Train-Sentinel2Patches.zip",
+            "SatelliteData/Sentinel2Patches-tiff/PA-Test-IID-Sentinel2Patches.zip",
+            "SatelliteData/Sentinel2Patches-tiff/PA-Test-OOD-Sentinel2Patches.zip",
+            "SatelliteData/Sentinel2Patches-tiff/PA-Test-GLC25-Sentinel2Patches.zip",
+            "SatelliteData/AlphaEarth/PA-train-alphaearth.parquet",
+            "SatelliteData/AlphaEarth/PA-test-iid-alphaearth.parquet",
+            "SatelliteData/AlphaEarth/PA-test-ood-alphaearth.parquet",
+            "SatelliteData/AlphaEarth/PA-test-glc25-alphaearth.parquet",
         ],
     },
     "satellitetimeseries": {
         "csvs": [
-            "SatelliteTimeSeries/PA-train-landsat-time-series-swir2.csv",
-            "SatelliteTimeSeries/PA-train-landsat-time-series-swir1.csv",
-            "SatelliteTimeSeries/PA-train-landsat-time-series-red.csv",
-            "SatelliteTimeSeries/PA-train-landsat-time-series-nir.csv",
-            "SatelliteTimeSeries/PA-train-landsat-time-series-green.csv",
-            "SatelliteTimeSeries/PA-train-landsat-time-series-blue.csv",
-            "SatelliteTimeSeries/PA-test-landsat-time-series-swir2.csv",
-            "SatelliteTimeSeries/PA-test-landsat-time-series-swir1.csv",
-            "SatelliteTimeSeries/PA-test-landsat-time-series-red.csv",
-            "SatelliteTimeSeries/PA-test-landsat-time-series-nir.csv",
-            "SatelliteTimeSeries/PA-test-landsat-time-series-green.csv",
-            "SatelliteTimeSeries/PA-test-landsat-time-series-blue.csv",
+            "TimeSeries/Landsat/values/PA-train-landsat_time_series.zip",
+            "TimeSeries/Landsat/values/PA-test-iid-landsat_time_series.zip",
+            "TimeSeries/Landsat/values/PA-test-ood-landsat_time_series.zip",
+            "TimeSeries/Landsat/values/PA-test-glc25-landsat_time_series.zip",
         ],
         "cubes": [
-            "SatelliteTimeSeries/cubes/PA-train-landsat-time-series.zip",
-            "SatelliteTimeSeries/cubes/PA-test-landsat-time-series.zip",
+            "TimeSeries/Landsat/cubes/PA-train-landsat-time-series.zip",
+            "TimeSeries/Landsat/cubes/PA-test-iid-landsat-time-series.zip",
+            "TimeSeries/Landsat/cubes/PA-test-ood-landsat-time-series.zip",
+            "TimeSeries/Landsat/cubes/PA-test-glc25-landsat-time-series.zip",
         ],
     },
 }
@@ -181,9 +180,6 @@ METADATA = {
         "PresenceAbsenceSurveys/PA_metadata_test_iid.csv",
         "PresenceAbsenceSurveys/PA_metadata_test_ood.csv",
         "PresenceAbsenceSurveys/PA_metadata_test_glc25.csv",
-        "PresenceAbsenceSurveys/test_labels_iid.csv",
-        "PresenceAbsenceSurveys/test_labels_ood.csv",
-        "PresenceAbsenceSurveys/test_labels_glc25.csv",
     ],
 }
 

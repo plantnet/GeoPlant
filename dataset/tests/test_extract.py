@@ -72,9 +72,7 @@ def test_manifest_entries_can_group_multipart_files():
 
 
 def test_multipart_extract_dir_removes_part_suffix():
-    assert multipart_extract_dir("SatellitePatches/PO-Train-SatellitePatches-RGB-part-00.zip").as_posix() == (
-        "SatellitePatches/PO-Train-SatellitePatches-RGB"
-    )
+    assert multipart_extract_dir("parts/dataset-part-23.zip").as_posix() == "parts/dataset"
 
 
 def test_extract_downloaded_file_groups_waits_for_complete_group(tmp_path):

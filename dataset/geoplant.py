@@ -25,6 +25,7 @@ from .data_download import (
 Source = Literal["po", "pa"]
 SourceSelection = Source | list[Source]
 VariableSelection = str | list[str]
+SatelliteModalitySelection = str | list[str]
 
 
 class GeoPlant:
@@ -65,6 +66,7 @@ class GeoPlant:
         variables: str | list[str] | None = None,
         cube: bool = False,
         cubes: bool = False,
+        satellite_modalities: SatelliteModalitySelection | None = None,
         legacy: bool = False,
         legacy_rasters: bool = False,
     ) -> list[str]:
@@ -90,6 +92,7 @@ class GeoPlant:
             variables=variables,
             cube=cube,
             cubes=cubes,
+            satellite_modalities=satellite_modalities,
             legacy=legacy,
             legacy_rasters=legacy_rasters,
         )
@@ -101,6 +104,7 @@ class GeoPlant:
             legacy=request["legacy"],
             sources=request["sources"],
             variables=request["variables"],
+            satellite_modalities=request["satellite_modalities"],
         )
 
     def file_groups(
@@ -114,6 +118,7 @@ class GeoPlant:
         variables: str | list[str] | None = None,
         cube: bool = False,
         cubes: bool = False,
+        satellite_modalities: SatelliteModalitySelection | None = None,
         legacy: bool = False,
         legacy_rasters: bool = False,
     ) -> list[list[str]]:
@@ -132,6 +137,7 @@ class GeoPlant:
             variables=variables,
             cube=cube,
             cubes=cubes,
+            satellite_modalities=satellite_modalities,
             legacy=legacy,
             legacy_rasters=legacy_rasters,
         )
@@ -143,6 +149,7 @@ class GeoPlant:
             legacy=request["legacy"],
             sources=request["sources"],
             variables=request["variables"],
+            satellite_modalities=request["satellite_modalities"],
         )
 
     def download(
@@ -156,6 +163,7 @@ class GeoPlant:
         variables: str | list[str] | None = None,
         cube: bool = False,
         cubes: bool = False,
+        satellite_modalities: SatelliteModalitySelection | None = None,
         extract: bool = False,
         overwrite: bool = False,
         legacy: bool = False,
@@ -190,6 +198,7 @@ class GeoPlant:
             variables=variables,
             cube=cube,
             cubes=cubes,
+            satellite_modalities=satellite_modalities,
             legacy=legacy,
             legacy_rasters=legacy_rasters,
         )
@@ -215,6 +224,7 @@ class GeoPlant:
         variables: str | list[str] | None = None,
         cube: bool = False,
         cubes: bool = False,
+        satellite_modalities: SatelliteModalitySelection | None = None,
         overwrite: bool = False,
         legacy: bool = False,
         legacy_rasters: bool = False,
@@ -234,6 +244,7 @@ class GeoPlant:
             variables=variables,
             cube=cube,
             cubes=cubes,
+            satellite_modalities=satellite_modalities,
             legacy=legacy,
             legacy_rasters=legacy_rasters,
         )
@@ -256,12 +267,14 @@ class GeoPlant:
         variables: VariableSelection | None,
         cube: bool,
         cubes: bool,
+        satellite_modalities: SatelliteModalitySelection | None,
         legacy: bool,
         legacy_rasters: bool,
     ) -> dict[str, bool | list[str] | None]:
         """Normalize friendly API selections into downloader flags."""
         selected_sources = self._combine_sources(source, sources)
         selected_variables = self._normalize_variables(variables)
+        selected_satellite_modalities = self._normalize_satellite_modalities(satellite_modalities)
 
         metadata_requested = bool(metadata)
         if isinstance(metadata, (str, list)):
@@ -286,6 +299,7 @@ class GeoPlant:
             "legacy": legacy or legacy_rasters,
             "sources": selected_sources,
             "variables": selected_variables,
+            "satellite_modalities": selected_satellite_modalities,
         }
 
     @staticmethod
@@ -317,6 +331,21 @@ class GeoPlant:
         if unknown_sources:
             raise ValueError(f"Unknown sources: {unknown_sources}")
         return list(sources)
+
+    @staticmethod
+    def _normalize_satellite_modalities(
+        modalities: SatelliteModalitySelection | list[str] | None,
+    ) -> list[str] | None:
+        """Validate and normalize satellite modality selections."""
+        if modalities is None:
+            return None
+        if isinstance(modalities, str):
+            modalities = [modalities]
+        modalities = [modality.replace("-", "_") for modality in modalities]
+        unknown_modalities = sorted(set(modalities).difference({"sentinel2_jpeg", "sentinel2_tiff", "alphaearth"}))
+        if unknown_modalities:
+            raise ValueError(f"Unknown satellite modalities: {unknown_modalities}")
+        return list(modalities)
 
     @staticmethod
     def _combine_variables(

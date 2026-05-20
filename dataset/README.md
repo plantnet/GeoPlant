@@ -5,7 +5,14 @@ Download selected GeoPlant metadata, rasters, and pre-extracted modalities witho
 ## Install
 
 ```bash
-pip install -r dataset/requirements.txt
+uv sync
+```
+
+For tests:
+
+```bash
+uv sync --group dev
+uv run pytest dataset/tests -q
 ```
 
 ## Usage
@@ -35,7 +42,7 @@ The downloader supports:
 Data types:
   --metadata
   --rasters
-  --pre-extracted
+  --pre-extracted, --ready-to-use
   --cube               Download cube archives instead of CSV values when available
   --extract            Extract selected zip archives after all required files download
   --legacy            Download legacy raster/value files instead of the current default
@@ -49,7 +56,8 @@ Data sources:
 
 If no source is selected for `--metadata`, both PO and PA metadata are downloaded.
 PA metadata includes the train file plus the explicit IID, OOD, and combined
-GLC25 test metadata and label files.
+GLC25 test files. The test labels are carried by those split files, so the
+downloader does not request separate `test_labels*.csv` files.
 
 For `--pre-extracted`, you must also select one or more variables:
 
@@ -61,10 +69,15 @@ Variables:
   --humanfootprint
   --landcover
   --soilgrids
-  --satellitepatches
+  --satellitedata
   --satellitetimeseries
   --all-variables
 ```
+
+`--satellitedata` resolves files under `SatelliteData/`: Sentinel-2 JPEG
+archives, Sentinel-2 TIFF archives, and AlphaEarth Parquet files.
+Use `--sentinel2-jpeg`, `--sentinel2-tiff`, or `--alphaearth` to limit
+satellite downloads to one or more modalities.
 
 ## Examples
 
@@ -74,7 +87,7 @@ Download all metadata:
 python -m dataset.data_download --metadata --data ./data
 ```
 
-Download PA climate CSVs:
+Download PA Bioclim time-series values:
 
 ```bash
 python -m dataset.data_download \
@@ -88,7 +101,7 @@ Download PO Landsat time-series cubes:
 
 ```bash
 python -m dataset.data_download \
-  --pre-extracted \
+  --ready-to-use \
   --presence-only \
   --satellitetimeseries \
   --cube \
@@ -99,6 +112,17 @@ Download all raster layers that exist:
 
 ```bash
 python -m dataset.data_download --rasters --all-variables --data ./data
+```
+
+Download PA AlphaEarth only:
+
+```bash
+python -m dataset.data_download \
+  --ready-to-use \
+  --presence-absence \
+  --satellitedata \
+  --alphaearth \
+  --data ./data
 ```
 
 ## Notes
