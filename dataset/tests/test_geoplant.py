@@ -3,6 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 import zipfile
 
+import pytest
+
 from dataset import GeoPlant
 from dataset.data_download import DownloadResult
 
@@ -59,6 +61,13 @@ def test_geoplant_can_select_satellite_modalities():
         "SatelliteData/AlphaEarth/PA-test-ood-alphaearth.parquet",
         "SatelliteData/AlphaEarth/PA-test-glc25-alphaearth.parquet",
     ]
+
+
+def test_geoplant_unknown_satellite_modality_lists_available_options():
+    geoplant = GeoPlant(root="data")
+
+    with pytest.raises(ValueError, match="Unknown satellite modality: 'tiff'.*sentinel2-tiff"):
+        geoplant.files(satellite_data=True, satellite_modalities="tiff")
 
 
 def test_geoplant_path_resolves_under_root():

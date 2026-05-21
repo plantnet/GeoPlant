@@ -33,11 +33,17 @@ class GeoPlant:
 
     def files(self, **kwargs) -> list[str]:
         """Return manifest paths selected by this request without downloading."""
-        return resolve_requested_files(**self._normalize_request(kwargs))
+        try:
+            return resolve_requested_files(**self._normalize_request(kwargs))
+        except ValueError as exc:
+            raise ValueError(str(exc)) from None
 
     def file_groups(self, **kwargs) -> list[list[str]]:
         """Return extraction-aware manifest groups selected by this request."""
-        return resolve_requested_file_groups(**self._normalize_request(kwargs))
+        try:
+            return resolve_requested_file_groups(**self._normalize_request(kwargs))
+        except ValueError as exc:
+            raise ValueError(str(exc)) from None
 
     def download(self, *, extract: bool = False, overwrite: bool = False, **kwargs) -> list[DownloadResult]:
         """Download selected files into ``root``."""

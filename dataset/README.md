@@ -119,6 +119,6 @@ gp.download(rasters=True, variables="climate")
 ## Notes
 
 - Downloaded files keep the published Seafile folder structure under `--data`.
-- `--environmental-values` means files under `EnvironmentalValues/`.
+- `geoplant download environmental-values` means files under `EnvironmentalValues/`.
 - Bioclim and Landsat time-series have their own categories.
 - `--legacy` affects rasters and environmental values where legacy files exist.

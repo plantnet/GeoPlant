@@ -31,6 +31,68 @@ It integrates expert-verified species observations with rich environmental predi
 
 ---
 
+## Download
+
+The downloader keeps the published Seafile folder structure under the output directory.
+
+```bash
+uv sync
+uv run geoplant download metadata --data ./data
+```
+
+Download tabular EnvironmentalValues:
+
+```bash
+uv run geoplant download environmental-values --source both --data ./data
+```
+
+Download a subset:
+
+```bash
+uv run geoplant download environmental-values --source pa --variables elevation soilgrids --data ./data
+uv run geoplant download satellite-data --source pa --modalities alphaearth --data ./data
+uv run geoplant download bioclim cubes --source pa --extract --data ./data
+uv run geoplant download landsat values --source po --data ./data
+```
+
+Available categories:
+
+```text
+metadata
+rasters
+environmental-values
+bioclim values
+bioclim cubes
+landsat values
+landsat cubes
+satellite-data
+```
+
+Filters:
+
+```text
+--source po|pa|both
+--variables elevation humanfootprint landcover soilgrids climate
+--modalities alphaearth sentinel2-tiff sentinel2-jpeg
+--legacy
+--extract
+```
+
+Python API:
+
+```python
+from dataset import GeoPlant
+
+gp = GeoPlant(root="data")
+gp.download_environmental_values(source="pa", variables=["elevation", "soilgrids"])
+gp.download_satellite_data(source="pa", modalities="alphaearth")
+gp.download_bioclim("cubes", source="pa", extract=True)
+```
+
+More examples live in [`dataset/README.md`](dataset/README.md).
+
+---
+
 ## 🔎 Key Resources
 
 | Resource                  | Description                                                     | Link                                                                                                                                                      |

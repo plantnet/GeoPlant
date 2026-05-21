@@ -32,6 +32,13 @@ notebook = [
 test = [
     "pytest",
 ]
+xgboost = [
+    "numpy>=1.23",
+    "pandas>=2.0",
+    "scikit-learn>=1.3",
+    "tqdm>=4.66",
+    "xgboost>=3.0",
+]
 
 [project.scripts]
 geoplant = "dataset.data_download:main"
@@ -41,5 +48,8 @@ dev = [
     "pytest",
 ]
 
-[tool.setuptools.packages.find]
-include = ["dataset*"]
+[tool.setuptools]
+packages = ["dataset", "geoplant_xgb"]
+
+[tool.setuptools.package-dir]
+geoplant_xgb = "baselines/XGBoost/geoplant_xgb"

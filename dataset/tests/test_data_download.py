@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from dataset.data_download import build_parser, collect_requested_files
 
 
@@ -89,6 +91,13 @@ def test_satellite_data_can_filter_modalities():
         "SatelliteData/AlphaEarth/PA-test-ood-alphaearth.parquet",
         "SatelliteData/AlphaEarth/PA-test-glc25-alphaearth.parquet",
     ]
+
+
+def test_satellite_data_unknown_modality_lists_available_options():
+    args = build_parser().parse_args(["download", "satellite-data", "--modalities", "tiff"])
+
+    with pytest.raises(ValueError, match="Unknown satellite modality: 'tiff'.*sentinel2-tiff"):
+        collect_requested_files(args)
 
 
 def test_rasters_can_filter_variables():

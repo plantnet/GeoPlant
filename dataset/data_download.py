@@ -7,6 +7,7 @@ import os
 import re
 import zipfile
 from dataclasses import dataclass
+from difflib import get_close_matches
 from pathlib import Path
 from typing import TypeAlias
 from urllib.parse import quote
@@ -23,6 +24,7 @@ ManifestEntry: TypeAlias = str | list[str]
 FileGroups: TypeAlias = list[list[str]]
 SatelliteModality: TypeAlias = str
 SATELLITE_MODALITIES = ("sentinel2_jpeg", "sentinel2_tiff", "alphaearth")
+SATELLITE_MODALITY_OPTIONS = tuple(modality.replace("_", "-") for modality in SATELLITE_MODALITIES)
 ENVIRONMENTAL_VALUE_VARIABLES = ("elevation", "humanfootprint", "landcover", "soilgrids")
 RASTER_VARIABLES = tuple(RASTERS)
 
@@ -365,10 +367,26 @@ def selected_satellite_modalities_from_names(modalities: list[str] | None) -> li
     """Normalize selected satellite data modalities."""
     if not modalities:
         return list(SATELLITE_MODALITIES)
-    normalized = [modality.replace("-", "_") for modality in modalities]
-    unknown = sorted(set(normalized).difference(SATELLITE_MODALITIES))
+    normalized = [modality.lower().replace("-", "_") for modality in modalities]
+    unknown = [
+        modality
+        for modality, normalized_modality in zip(modalities, normalized, strict=True)
+        if normalized_modality not in SATELLITE_MODALITIES
+    ]
     if unknown:
-        raise ValueError(f"Unknown satellite modalities: {unknown}")
+        options = ", ".join(SATELLITE_MODALITY_OPTIONS)
+        hints = []
+        for modality in unknown:
+            lowercase_modality = modality.lower()
+            if lowercase_modality in {"jpeg", "tiff"}:
+                hints.append(f"use 'sentinel2-{lowercase_modality}' for Sentinel-2 {lowercase_modality.upper()} patches")
+                continue
+            match = get_close_matches(lowercase_modality.replace("_", "-"), SATELLITE_MODALITY_OPTIONS, n=1)
+            if match:
+                hints.append(f"did you mean '{match[0]}'?")
+        hint = f" ({'; '.join(hints)})" if hints else ""
+        quoted_unknown = ", ".join(f"'{modality}'" for modality in unknown)
+        raise ValueError(f"Unknown satellite modality: {quoted_unknown}. Available options: {options}.{hint}")
     return normalized
 
 
@@ -599,8 +617,11 @@ def build_parser() -> argparse.ArgumentParser:
     modalities_parent.add_argument(
         "--modalities",
         nargs="+",
-        choices=("sentinel2-jpeg", "sentinel2-tiff", "alphaearth"),
-        help="Filter --satellite-data modalities. Defaults to all modalities.",
+        metavar="{sentinel2-jpeg,sentinel2-tiff,alphaearth}",
+        help=(
+            "Filter satellite-data modalities. Options: "
+            "sentinel2-jpeg, sentinel2-tiff, alphaearth. Defaults to all modalities."
+        ),
     )
 
     categories.add_parser("metadata", parents=[common, source_parent]).set_defaults(metadata=True)
