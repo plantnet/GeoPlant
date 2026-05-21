@@ -4,7 +4,7 @@ from dataset.data_download import build_parser, collect_requested_files
 
 
 def test_metadata_defaults_to_both_sources():
-    args = build_parser().parse_args(["--metadata"])
+    args = build_parser().parse_args(["download", "metadata"])
     assert collect_requested_files(args) == [
         "PresenceOnlyOccurrences/PO_metadata_train.csv",
         "PresenceAbsenceSurveys/PA_metadata_train.csv",
@@ -15,7 +15,7 @@ def test_metadata_defaults_to_both_sources():
 
 
 def test_environmental_values_defaults_to_all_variables_and_sources():
-    args = build_parser().parse_args(["--environmental-values"])
+    args = build_parser().parse_args(["download", "environmental-values"])
     assert collect_requested_files(args) == [
         "EnvironmentalValues/Elevation/PO-train-elevation.csv",
         "EnvironmentalValues/Elevation/PA-train-elevation.csv",
@@ -41,7 +41,7 @@ def test_environmental_values_defaults_to_all_variables_and_sources():
 
 
 def test_environmental_values_can_filter_source_and_variables():
-    args = build_parser().parse_args(["--environmental-values", "--source", "pa", "--variables", "elevation"])
+    args = build_parser().parse_args(["download", "environmental-values", "--source", "pa", "--variables", "elevation"])
     assert collect_requested_files(args) == [
         "EnvironmentalValues/Elevation/PA-train-elevation.csv",
         "EnvironmentalValues/Elevation/PA-test-iid-elevation.csv",
@@ -51,8 +51,8 @@ def test_environmental_values_can_filter_source_and_variables():
 
 
 def test_bioclim_values_and_cubes_are_separate_categories():
-    values = collect_requested_files(build_parser().parse_args(["--bioclim-values", "--source", "po"]))
-    cubes = collect_requested_files(build_parser().parse_args(["--bioclim-cubes", "--source", "pa"]))
+    values = collect_requested_files(build_parser().parse_args(["download", "bioclim", "values", "--source", "po"]))
+    cubes = collect_requested_files(build_parser().parse_args(["download", "bioclim", "cubes", "--source", "pa"]))
     assert values == ["TimeSeries/Bioclim/values/PO-train-bioclimatic_time_series.zip"]
     assert cubes == [
         "TimeSeries/Bioclim/cubes/PA-train-bioclimatic-monthly.zip",
@@ -63,8 +63,8 @@ def test_bioclim_values_and_cubes_are_separate_categories():
 
 
 def test_landsat_values_and_cubes_are_separate_categories():
-    values = collect_requested_files(build_parser().parse_args(["--landsat-values", "--source", "both"]))
-    cubes = collect_requested_files(build_parser().parse_args(["--landsat-cubes", "--source", "both"]))
+    values = collect_requested_files(build_parser().parse_args(["download", "landsat", "values", "--source", "both"]))
+    cubes = collect_requested_files(build_parser().parse_args(["download", "landsat", "cubes", "--source", "both"]))
     assert values == [
         "TimeSeries/Landsat/values/PO-train-landsat-time-series.zip",
         "TimeSeries/Landsat/values/PA-train-landsat_time_series.zip",
@@ -82,7 +82,7 @@ def test_landsat_values_and_cubes_are_separate_categories():
 
 
 def test_satellite_data_can_filter_modalities():
-    args = build_parser().parse_args(["--satellite-data", "--source", "pa", "--modalities", "alphaearth"])
+    args = build_parser().parse_args(["download", "satellite-data", "--source", "pa", "--modalities", "alphaearth"])
     assert collect_requested_files(args) == [
         "SatelliteData/AlphaEarth/PA-train-alphaearth.parquet",
         "SatelliteData/AlphaEarth/PA-test-iid-alphaearth.parquet",
@@ -92,7 +92,7 @@ def test_satellite_data_can_filter_modalities():
 
 
 def test_rasters_can_filter_variables():
-    args = build_parser().parse_args(["--rasters", "--variables", "climate"])
+    args = build_parser().parse_args(["download", "rasters", "--variables", "climate"])
     assert collect_requested_files(args) == [
         "EnvironmentalRasters/Climate/BioClimatic_Average_1981-2010.zip",
         "EnvironmentalRasters/Climate/Climatic_Monthly_1979-2019.zip",

@@ -54,6 +54,67 @@ class GeoPlant:
             extract_downloaded_file_groups(requested_file_groups, self.root, successful_files, overwrite=overwrite)
         return results
 
+    def download_metadata(self, source: Source = "both", **kwargs) -> list[DownloadResult]:
+        """Download PO/PA metadata."""
+        return self.download(metadata=True, source=source, **kwargs)
+
+    def download_rasters(
+        self,
+        variables: VariableSelection | None = None,
+        *,
+        legacy: bool = False,
+        **kwargs,
+    ) -> list[DownloadResult]:
+        """Download environmental rasters."""
+        return self.download(rasters=True, variables=variables, legacy=legacy, **kwargs)
+
+    def download_environmental_values(
+        self,
+        source: Source = "both",
+        variables: VariableSelection | None = None,
+        *,
+        legacy: bool = False,
+        **kwargs,
+    ) -> list[DownloadResult]:
+        """Download tabular EnvironmentalValues files."""
+        return self.download(
+            environmental_values=True,
+            source=source,
+            variables=variables,
+            legacy=legacy,
+            **kwargs,
+        )
+
+    def download_bioclim(self, representation: Literal["values", "cubes"], source: Source = "both", **kwargs) -> list[DownloadResult]:
+        """Download Bioclim time-series values or cubes."""
+        if representation == "values":
+            return self.download(bioclim_values=True, source=source, **kwargs)
+        if representation == "cubes":
+            return self.download(bioclim_cubes=True, source=source, **kwargs)
+        raise ValueError(f"Unknown Bioclim representation: {representation}")
+
+    def download_landsat(self, representation: Literal["values", "cubes"], source: Source = "both", **kwargs) -> list[DownloadResult]:
+        """Download Landsat time-series values or cubes."""
+        if representation == "values":
+            return self.download(landsat_values=True, source=source, **kwargs)
+        if representation == "cubes":
+            return self.download(landsat_cubes=True, source=source, **kwargs)
+        raise ValueError(f"Unknown Landsat representation: {representation}")
+
+    def download_satellite_data(
+        self,
+        source: Source = "both",
+        modalities: SatelliteModalitySelection | None = None,
+        **kwargs,
+    ) -> list[DownloadResult]:
+        """Download SatelliteData files."""
+        return self.download(
+            satellite_data=True,
+            source=source,
+            satellite_modalities=modalities,
+            **kwargs,
+        )
+
     def extract(self, *, overwrite: bool = False, **kwargs) -> list[ExtractResult]:
         """Extract selected local zip archives under ``root``."""
         requested_file_groups = self.file_groups(**kwargs)
@@ -91,7 +152,7 @@ class GeoPlant:
         if variables is None:
             return None
         if variables == "all":
-            return list(VARIABLES)
+            return None
         if isinstance(variables, str):
             variables = [variables]
         unknown = sorted(set(variables).difference(VARIABLES))

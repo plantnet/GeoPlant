@@ -17,17 +17,17 @@ uv run pytest dataset/tests -q
 
 ## CLI
 
-Use one or more data categories:
+Use one data category:
 
 ```text
---metadata
---environmental-values
---bioclim-values
---bioclim-cubes
---landsat-values
---landsat-cubes
---satellite-data
---rasters
+geoplant download metadata
+geoplant download environmental-values
+geoplant download bioclim values
+geoplant download bioclim cubes
+geoplant download landsat values
+geoplant download landsat cubes
+geoplant download satellite-data
+geoplant download rasters
 ```
 
 Useful filters:
@@ -47,8 +47,7 @@ Category defaults download everything inside that category. Filters narrow it.
 All tabular `EnvironmentalValues`:
 
 ```bash
-uv run python -m dataset.data_download \
-  --environmental-values \
+uv run geoplant download environmental-values \
   --source both \
   --data ./data
 ```
@@ -56,8 +55,7 @@ uv run python -m dataset.data_download \
 Only PA elevation values:
 
 ```bash
-uv run python -m dataset.data_download \
-  --environmental-values \
+uv run geoplant download environmental-values \
   --source pa \
   --variables elevation \
   --data ./data
@@ -66,8 +64,7 @@ uv run python -m dataset.data_download \
 Bioclim time-series values:
 
 ```bash
-uv run python -m dataset.data_download \
-  --bioclim-values \
+uv run geoplant download bioclim values \
   --source both \
   --data ./data
 ```
@@ -75,8 +72,7 @@ uv run python -m dataset.data_download \
 Bioclim cubes, PA only, extracted after download:
 
 ```bash
-uv run python -m dataset.data_download \
-  --bioclim-cubes \
+uv run geoplant download bioclim cubes \
   --source pa \
   --extract \
   --data ./data
@@ -85,8 +81,7 @@ uv run python -m dataset.data_download \
 Landsat cubes, PO only:
 
 ```bash
-uv run python -m dataset.data_download \
-  --landsat-cubes \
+uv run geoplant download landsat cubes \
   --source po \
   --data ./data
 ```
@@ -94,8 +89,7 @@ uv run python -m dataset.data_download \
 PA AlphaEarth only:
 
 ```bash
-uv run python -m dataset.data_download \
-  --satellite-data \
+uv run geoplant download satellite-data \
   --source pa \
   --modalities alphaearth \
   --data ./data
@@ -104,8 +98,7 @@ uv run python -m dataset.data_download \
 Climate rasters only:
 
 ```bash
-uv run python -m dataset.data_download \
-  --rasters \
+uv run geoplant download rasters \
   --variables climate \
   --data ./data
 ```

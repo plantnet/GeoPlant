@@ -307,20 +307,6 @@ def file_groups_for_variable(
     return file_groups_from_entries(variable_entry.get("csvs", variable_entry.get("not_cubes", [])))
 
 
-def selected_satellite_modalities(args: argparse.Namespace) -> list[SatelliteModality]:
-    """Return selected satellite data modalities."""
-    selected = [
-        modality
-        for flag, modality in (
-            ("sentinel2_jpeg", "sentinel2_jpeg"),
-            ("sentinel2_tiff", "sentinel2_tiff"),
-            ("alphaearth", "alphaearth"),
-        )
-        if getattr(args, flag, False)
-    ]
-    return selected or list(SATELLITE_MODALITIES)
-
-
 def satellite_modality(file_path: str) -> SatelliteModality | None:
     """Return the satellite modality for a manifest path."""
     if "/Sentinel2Patches-jpeg/" in file_path:
@@ -551,71 +537,48 @@ def build_parser() -> argparse.ArgumentParser:
             "Download GeoPlant data by storage category."
         )
     )
-    parser.add_argument(
+    commands = parser.add_subparsers(dest="command", required=True)
+    download = commands.add_parser("download", help="Download one GeoPlant data category.")
+    download.set_defaults(
+        metadata=False,
+        rasters=False,
+        environmental_values=False,
+        bioclim_values=False,
+        bioclim_cubes=False,
+        landsat_values=False,
+        landsat_cubes=False,
+        satellite_data=False,
+        legacy=False,
+        extract=False,
+        data="data",
+        source="both",
+        variables=None,
+        modalities=None,
+    )
+    categories = download.add_subparsers(dest="category", required=True)
+
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument(
         "--data",
         default="data",
         help='Destination directory for downloaded files (default: "data").',
     )
-
-    data_group = parser.add_argument_group("Data categories")
-    data_group.add_argument(
-        "--metadata",
-        action="store_true",
-        help="Download source metadata.",
-    )
-    data_group.add_argument(
-        "--rasters",
-        action="store_true",
-        help="Download environmental raster layers. Use --variables to filter.",
-    )
-    data_group.add_argument(
-        "--environmental-values",
-        action="store_true",
-        help="Download tabular EnvironmentalValues files.",
-    )
-    data_group.add_argument(
-        "--bioclim-values",
-        action="store_true",
-        help="Download Bioclim time-series value archives.",
-    )
-    data_group.add_argument(
-        "--bioclim-cubes",
-        action="store_true",
-        help="Download Bioclim time-series cube archives.",
-    )
-    data_group.add_argument(
-        "--landsat-values",
-        action="store_true",
-        help="Download Landsat time-series value archives.",
-    )
-    data_group.add_argument(
-        "--landsat-cubes",
-        action="store_true",
-        help="Download Landsat time-series cube archives.",
-    )
-    data_group.add_argument(
-        "--satellite-data",
-        action="store_true",
-        help="Download SatelliteData files. Use --modalities to filter.",
-    )
-    data_group.add_argument(
+    common.add_argument(
         "--extract",
         action="store_true",
         help="Extract selected zip archives after download.",
     )
-    data_group.add_argument(
-        "--legacy",
-        action="store_true",
-        help="Use legacy files where available for rasters/environmental values.",
-    )
 
-    parser.add_argument(
+    source_parent = argparse.ArgumentParser(add_help=False)
+    source_parent.add_argument(
         "--source",
         choices=("po", "pa", "both"),
         default="both",
         help="Select presence-only, presence-absence, or both subsets.",
     )
-    parser.add_argument(
+
+    variables_parent = argparse.ArgumentParser(add_help=False)
+    variables_parent.add_argument(
         "--variables",
         nargs="+",
         choices=VARIABLES,
@@ -624,12 +587,43 @@ def build_parser() -> argparse.ArgumentParser:
             "Defaults to every variable supported by the selected category."
         ),
     )
-    parser.add_argument(
+
+    legacy_parent = argparse.ArgumentParser(add_help=False)
+    legacy_parent.add_argument(
+        "--legacy",
+        action="store_true",
+        help="Use legacy files where available for rasters/environmental values.",
+    )
+
+    modalities_parent = argparse.ArgumentParser(add_help=False)
+    modalities_parent.add_argument(
         "--modalities",
         nargs="+",
         choices=("sentinel2-jpeg", "sentinel2-tiff", "alphaearth"),
         help="Filter --satellite-data modalities. Defaults to all modalities.",
     )
+
+    categories.add_parser("metadata", parents=[common, source_parent]).set_defaults(metadata=True)
+    categories.add_parser("rasters", parents=[common, variables_parent, legacy_parent]).set_defaults(rasters=True)
+    categories.add_parser(
+        "environmental-values",
+        parents=[common, source_parent, variables_parent, legacy_parent],
+    ).set_defaults(environmental_values=True)
+
+    bioclim = categories.add_parser("bioclim")
+    bioclim_subcommands = bioclim.add_subparsers(dest="representation", required=True)
+    bioclim_subcommands.add_parser("values", parents=[common, source_parent]).set_defaults(bioclim_values=True)
+    bioclim_subcommands.add_parser("cubes", parents=[common, source_parent]).set_defaults(bioclim_cubes=True)
+
+    landsat = categories.add_parser("landsat")
+    landsat_subcommands = landsat.add_subparsers(dest="representation", required=True)
+    landsat_subcommands.add_parser("values", parents=[common, source_parent]).set_defaults(landsat_values=True)
+    landsat_subcommands.add_parser("cubes", parents=[common, source_parent]).set_defaults(landsat_cubes=True)
+
+    categories.add_parser(
+        "satellite-data",
+        parents=[common, source_parent, modalities_parent],
+    ).set_defaults(satellite_data=True)
     return parser
 
 
@@ -647,8 +641,8 @@ def main(argv: list[str] | None = None) -> int:
     requested_files = flatten_file_groups(requested_file_groups)
     if not requested_files:
         parser.error(
-            "No files selected. Choose at least one data category such as "
-            "`--metadata`, `--environmental-values`, or `--bioclim-values`."
+            "No files selected. Choose a data category such as "
+            "`download metadata`, `download environmental-values`, or `download bioclim values`."
         )
 
     results = download_files(requested_files, args.data)
