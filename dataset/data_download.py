@@ -25,8 +25,9 @@ FileGroups: TypeAlias = list[list[str]]
 SatelliteModality: TypeAlias = str
 SATELLITE_MODALITIES = ("sentinel2_jpeg", "sentinel2_tiff", "alphaearth")
 SATELLITE_MODALITY_OPTIONS = tuple(modality.replace("_", "-") for modality in SATELLITE_MODALITIES)
-ENVIRONMENTAL_VALUE_VARIABLES = ("elevation", "humanfootprint", "landcover", "soilgrids")
+ENVIRONMENTAL_VALUE_VARIABLES = ("climate", "elevation", "humanfootprint", "landcover", "soilgrids")
 RASTER_VARIABLES = tuple(RASTERS)
+EXTRACT_COMPLETE_MARKER = ".geoplant_extract_complete"
 
 
 @dataclass(frozen=True)
@@ -206,6 +207,11 @@ def multipart_extract_dir(archive_path: str | Path) -> Path:
     return archive_path.with_name(group_stem)
 
 
+def extract_complete_marker(output_dir: Path) -> Path:
+    """Return the marker path written after a grouped extraction completes."""
+    return output_dir / EXTRACT_COMPLETE_MARKER
+
+
 def extract_downloaded_file_groups(
     file_groups: FileGroups,
     output_dir: str | Path,
@@ -239,7 +245,8 @@ def extract_downloaded_file_groups(
 
         archive_paths = [output_dir / archive for archive in archives]
         shared_output_dir = multipart_extract_dir(archive_paths[0])
-        if shared_output_dir.exists() and not overwrite:
+        marker_path = extract_complete_marker(shared_output_dir)
+        if shared_output_dir.exists() and marker_path.exists() and not overwrite:
             print(f"{shared_output_dir} already exists; skipping grouped extraction.")
             extract_results.extend(
                 ExtractResult(
@@ -251,9 +258,13 @@ def extract_downloaded_file_groups(
                 for archive_path in archive_paths
             )
             continue
+        if shared_output_dir.exists() and not overwrite:
+            print(f"{shared_output_dir} exists without completion marker; resuming grouped extraction.")
 
         for archive_path in archive_paths:
             extract_results.append(extract_file(archive_path, shared_output_dir, overwrite=True))
+        if all(result.success for result in extract_results[-len(archive_paths):]):
+            marker_path.write_text("\n".join(str(archive_path) for archive_path in archive_paths) + "\n")
     return extract_results
 
 
@@ -518,12 +529,12 @@ def collect_requested_file_groups(args: argparse.Namespace) -> FileGroups:
     if args.bioclim_values:
         for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
             if source_name in source_names:
-                requested_file_groups.extend(file_groups_for_variable(structure, False, "climate"))
+                requested_file_groups.extend(file_groups_for_variable(structure, False, "bioclim"))
 
     if args.bioclim_cubes:
         for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
             if source_name in source_names:
-                requested_file_groups.extend(file_groups_for_variable(structure, True, "climate"))
+                requested_file_groups.extend(file_groups_for_variable(structure, True, "bioclim"))
 
     if args.landsat_values:
         for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):

@@ -29,6 +29,20 @@ def test_geoplant_selects_environmental_values_with_filters():
     ]
 
 
+def test_geoplant_selects_climate_environmental_values():
+    geoplant = GeoPlant(root="data")
+
+    assert geoplant.files(environmental_values=True, source="pa", variables="climate") == [
+        "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
+    ]
+    assert geoplant.files(environmental_values=True, source="po", variables="climate") == [
+        "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
+    ]
+
+
 def test_geoplant_selects_bioclim_values_and_cubes():
     geoplant = GeoPlant(root="data")
 

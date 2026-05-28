@@ -19,6 +19,11 @@ def test_metadata_defaults_to_both_sources():
 def test_environmental_values_defaults_to_all_variables_and_sources():
     args = build_parser().parse_args(["download", "environmental-values"])
     assert collect_requested_files(args) == [
+        "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
         "EnvironmentalValues/Elevation/PO-train-elevation.csv",
         "EnvironmentalValues/Elevation/PA-train-elevation.csv",
         "EnvironmentalValues/Elevation/PA-test-iid-elevation.csv",
@@ -49,6 +54,16 @@ def test_environmental_values_can_filter_source_and_variables():
         "EnvironmentalValues/Elevation/PA-test-iid-elevation.csv",
         "EnvironmentalValues/Elevation/PA-test-ood-elevation.csv",
         "EnvironmentalValues/Elevation/PA-test-glc25-elevation.csv",
+    ]
+
+
+def test_environmental_values_can_download_climate():
+    args = build_parser().parse_args(["download", "environmental-values", "--source", "pa", "--variables", "climate"])
+    assert collect_requested_files(args) == [
+        "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
+        "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
     ]
 
 

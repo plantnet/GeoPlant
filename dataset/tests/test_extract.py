@@ -111,3 +111,51 @@ def test_extract_downloaded_file_groups_extracts_complete_group(tmp_path):
     assert [result.success for result in results] == [True, True]
     assert (tmp_path / "parts/dataset/a.txt").read_text() == "content"
     assert (tmp_path / "parts/dataset/b.txt").read_text() == "content"
+    assert (tmp_path / "parts/dataset/.geoplant_extract_complete").exists()
+
+
+def test_extract_downloaded_file_groups_resumes_incomplete_existing_group(tmp_path):
+    archive_a = tmp_path / "parts/dataset-part-00.zip"
+    archive_b = tmp_path / "parts/dataset-part-01.zip"
+    output_dir = tmp_path / "parts/dataset"
+    archive_a.parent.mkdir()
+    output_dir.mkdir()
+    (output_dir / "a.txt").write_text("old")
+    for archive_path, file_name in [(archive_a, "a.txt"), (archive_b, "b.txt")]:
+        with zipfile.ZipFile(archive_path, "w") as archive:
+            archive.writestr(file_name, "content")
+
+    results = extract_downloaded_file_groups(
+        [["parts/dataset-part-00.zip", "parts/dataset-part-01.zip"]],
+        tmp_path,
+        successful_files={"parts/dataset-part-00.zip", "parts/dataset-part-01.zip"},
+    )
+
+    assert [result.success for result in results] == [True, True]
+    assert [result.skipped for result in results] == [False, False]
+    assert (output_dir / "a.txt").read_text() == "content"
+    assert (output_dir / "b.txt").read_text() == "content"
+    assert (output_dir / ".geoplant_extract_complete").exists()
+
+
+def test_extract_downloaded_file_groups_skips_existing_complete_group(tmp_path):
+    archive_a = tmp_path / "parts/dataset-part-00.zip"
+    archive_b = tmp_path / "parts/dataset-part-01.zip"
+    output_dir = tmp_path / "parts/dataset"
+    archive_a.parent.mkdir()
+    output_dir.mkdir()
+    (output_dir / ".geoplant_extract_complete").write_text("done\n")
+    for archive_path, file_name in [(archive_a, "a.txt"), (archive_b, "b.txt")]:
+        with zipfile.ZipFile(archive_path, "w") as archive:
+            archive.writestr(file_name, "content")
+
+    results = extract_downloaded_file_groups(
+        [["parts/dataset-part-00.zip", "parts/dataset-part-01.zip"]],
+        tmp_path,
+        successful_files={"parts/dataset-part-00.zip", "parts/dataset-part-01.zip"},
+    )
+
+    assert [result.success for result in results] == [True, True]
+    assert [result.skipped for result in results] == [True, True]
+    assert not (output_dir / "a.txt").exists()
+    assert not (output_dir / "b.txt").exists()

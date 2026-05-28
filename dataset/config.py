@@ -48,8 +48,12 @@ LEGACY_RASTERS = {
 PRESENCE_ONLY = {
     "climate": {
         "csvs": [
-            "TimeSeries/Bioclim/values/PO-train-bioclimatic_time_series.zip",
+            "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
         ],
+        "legacy_csvs": ["EnvironmentalValues/Climate/legacy/PO-train-bioclimatic-average.csv"],
+    },
+    "bioclim": {
+        "csvs": ["TimeSeries/Bioclim/values/PO-train-bioclimatic_time_series.zip"],
         "cubes": [
             "TimeSeries/Bioclim/cubes/PO-train-bioclimatic-monthly.zip",
         ],
@@ -88,6 +92,18 @@ PRESENCE_ONLY = {
 
 PRESENCE_ABSENCE = {
     "climate": {
+        "csvs": [
+            "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
+            "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
+            "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
+            "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
+        ],
+        "legacy_csvs": [
+            "EnvironmentalValues/Climate/legacy/PA-train-bioclimatic-average.csv",
+            "EnvironmentalValues/Climate/legacy/PA-test-bioclimatic-average.csv",
+        ],
+    },
+    "bioclim": {
         "csvs": [
             "TimeSeries/Bioclim/values/PA-train-bioclimatic_time_series.zip",
             "TimeSeries/Bioclim/values/PA-test-iid-bioclimatic_time_series.zip",

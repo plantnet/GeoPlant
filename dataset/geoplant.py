@@ -99,6 +99,10 @@ class GeoPlant:
             return self.download(bioclim_cubes=True, source=source, **kwargs)
         raise ValueError(f"Unknown Bioclim representation: {representation}")
 
+    def download_climate_values(self, source: Source = "both", **kwargs) -> list[DownloadResult]:
+        """Download tabular EnvironmentalValues/Climate CSV files."""
+        return self.download_environmental_values(source=source, variables="climate", **kwargs)
+
     def download_landsat(self, representation: Literal["values", "cubes"], source: Source = "both", **kwargs) -> list[DownloadResult]:
         """Download Landsat time-series values or cubes."""
         if representation == "values":
