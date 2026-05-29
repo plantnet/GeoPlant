@@ -10,6 +10,11 @@
 <br><br>
 </div>
 
+> [!NOTE]
+> **What's new in the GeoPlant ecosystem**
+> * **New downloader tool.** Python and CLI access for the newly structured dataset, so you can download only the components you need. See [`dataset/README.md`](dataset/README.md).
+> * **Data refreshed and fixed.** The update adds 30m OpenStreetMap-derived Human Footprint rasters, corrected/re-extracted SoilGrids values, and upgraded Sentinel-2 TIFF patches with RGB+NIR bands.
+> * **New evaluation protocols.** GeoPlant now includes IID, OOD, and GLC25 presence-absence test sets, with leaderboards designed to measure spatial generalization and rare-species performance.
 
 ## 🌿 Welcome to the GeoPlant Dataset Hub! 🌍
 
@@ -20,14 +25,18 @@ It integrates expert-verified species observations with rich environmental predi
 
 **Figure 1.** *GeoPlant combines 5M Presence-Only and 90k Presence-Absence records with Sentinel-2 imagery, Landsat time series, CHELSA climate, and environmental rasters for 10k+ European plant species.*
 
----
-
 ## 🚀 Quick Start
 
 - **[Dataset Overview](https://plantnet.github.io/GeoPlant/dataset/):** Learn about provided presence–absence and presence–only species data.  
 - **[Environmental Predictors](https://plantnet.github.io/GeoPlant/environmental_predictors/):** Explore different variables, e.g., satellite imagery, time series, climate, soil, land cover, and human footprint.  
 - **[Baselines & Benchmarking](https://plantnet.github.io/GeoPlant/baselines/):** See benchmark tasks, metrics, and baseline models.  
 - **[Resources & Download](https://plantnet.github.io/GeoPlant/resources/):** Links to Kaggle, Seafile, Hugging Face, and the NeurIPS 2024 paper.  
+
+---
+
+## Download
+
+See the downloader guide in [`dataset/README.md`](dataset/README.md).
 
 ---
 
@@ -49,15 +58,10 @@ It integrates expert-verified species observations with rich environmental predi
 | `dev`                      | Refactoring and better accessibility.                                              |
 | `docs`                     | Sources for the website documentation.                                                        |
 
-```bash
-# Example: switch to a baseline branch
-git fetch origin
-git checkout picekl/xgboost-baselines
-```
 
 ## 📜 Citation
 
-If you use GeoPlant, please cite the NeurIPS proceedings (and optionally the extended arXiv version):
+If you use GeoPlant, please cite the NeurIPS proceedings:
 
 **NeurIPS 2024 (Datasets & Benchmarks Track)**
 ```bibtex
