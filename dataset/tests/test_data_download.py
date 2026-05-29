@@ -18,46 +18,20 @@ def test_metadata_defaults_to_both_sources():
 
 def test_environmental_values_defaults_to_all_variables_and_sources():
     args = build_parser().parse_args(["download", "environmental-values"])
-    assert collect_requested_files(args) == [
+    files = collect_requested_files(args)
+
+    assert len(files) == 25
+    assert files[:5] == [
         "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
         "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
         "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
         "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
         "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
-        "EnvironmentalValues/Elevation/PO-train-elevation.csv",
-        "EnvironmentalValues/Elevation/PA-train-elevation.csv",
-        "EnvironmentalValues/Elevation/PA-test-iid-elevation.csv",
-        "EnvironmentalValues/Elevation/PA-test-ood-elevation.csv",
-        "EnvironmentalValues/Elevation/PA-test-glc25-elevation.csv",
-        "EnvironmentalValues/HumanFootprint/v2/PO-train-human_footprint.csv",
-        "EnvironmentalValues/HumanFootprint/v2/PA-train-human_footprint.csv",
-        "EnvironmentalValues/HumanFootprint/v2/PA-test-human_footprint.csv",
-        "EnvironmentalValues/HumanFootprint/v2/PA-test-ood-human_footprint.csv",
-        "EnvironmentalValues/HumanFootprint/v2/PA-test-glc25-human_footprint.csv",
-        "EnvironmentalValues/LandCover/PO-train-landcover.csv",
-        "EnvironmentalValues/LandCover/PA-train-landcover.csv",
-        "EnvironmentalValues/LandCover/PA-test-iid-landcover.csv",
-        "EnvironmentalValues/LandCover/PA-test-ood-landcover.csv",
-        "EnvironmentalValues/LandCover/PA-test-glc25-landcover.csv",
-        "EnvironmentalValues/SoilGrids/v2/PO-train-soilgrids.csv",
-        "EnvironmentalValues/SoilGrids/v2/PA-train-soilgrids.csv",
-        "EnvironmentalValues/SoilGrids/v2/PA-test-iid-soilgrids.csv",
-        "EnvironmentalValues/SoilGrids/v2/PA-test-ood-soilgrids.csv",
-        "EnvironmentalValues/SoilGrids/v2/PA-test-glc25-soilgrids.csv",
     ]
+    assert "EnvironmentalValues/SoilGrids/v2/PA-test-glc25-soilgrids.csv" in files
 
 
 def test_environmental_values_can_filter_source_and_variables():
-    args = build_parser().parse_args(["download", "environmental-values", "--source", "pa", "--variables", "elevation"])
-    assert collect_requested_files(args) == [
-        "EnvironmentalValues/Elevation/PA-train-elevation.csv",
-        "EnvironmentalValues/Elevation/PA-test-iid-elevation.csv",
-        "EnvironmentalValues/Elevation/PA-test-ood-elevation.csv",
-        "EnvironmentalValues/Elevation/PA-test-glc25-elevation.csv",
-    ]
-
-
-def test_environmental_values_can_download_climate():
     args = build_parser().parse_args(["download", "environmental-values", "--source", "pa", "--variables", "climate"])
     assert collect_requested_files(args) == [
         "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",

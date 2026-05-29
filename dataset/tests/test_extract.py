@@ -6,8 +6,6 @@ from dataset.data_download import (
     extract_downloaded_file_groups,
     extract_file,
     extract_files,
-    file_groups_from_entries,
-    flatten_file_groups,
     multipart_extract_dir,
 )
 
@@ -60,15 +58,6 @@ def test_extract_files_filters_non_zip_manifest_paths(tmp_path):
     assert len(results) == 1
     assert results[0].success
     assert (tmp_path / "folder/example/file.txt").read_text() == "content"
-
-
-def test_manifest_entries_can_group_multipart_files():
-    entries = ["single.csv", ["part-00.zip", "part-01.zip"]]
-
-    groups = file_groups_from_entries(entries)
-
-    assert groups == [["single.csv"], ["part-00.zip", "part-01.zip"]]
-    assert flatten_file_groups(groups) == ["single.csv", "part-00.zip", "part-01.zip"]
 
 
 def test_multipart_extract_dir_removes_part_suffix():

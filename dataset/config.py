@@ -8,7 +8,7 @@ VARIABLES = [
     "landcover",
     "soilgrids",
     "satellitedata",
-    "satellitetimeseries",
+    "landsat",
 ]
 
 PO_SENTINEL2_TIFF_PARTS = [
@@ -80,7 +80,7 @@ PRESENCE_ONLY = {
             "SatelliteData/AlphaEarth/PO-train-alphaearth.parquet",
         ],
     },
-    "satellitetimeseries": {
+    "landsat": {
         "csvs": [
             "TimeSeries/Landsat/values/PO-train-landsat-time-series.zip",
         ],
@@ -171,7 +171,7 @@ PRESENCE_ABSENCE = {
             "SatelliteData/AlphaEarth/PA-test-glc25-alphaearth.parquet",
         ],
     },
-    "satellitetimeseries": {
+    "landsat": {
         "csvs": [
             "TimeSeries/Landsat/values/PA-train-landsat_time_series.zip",
             "TimeSeries/Landsat/values/PA-test-iid-landsat_time_series.zip",

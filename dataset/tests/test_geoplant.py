@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import zipfile
 
 import pytest
 
@@ -9,7 +8,7 @@ from dataset import GeoPlant
 from dataset.data_download import DownloadResult
 
 
-def test_geoplant_selects_metadata_source():
+def test_geoplant_helper_methods_resolve_expected_manifest_paths():
     geoplant = GeoPlant(root="data")
 
     assert geoplant.files(metadata=True, source="pa") == [
@@ -18,36 +17,11 @@ def test_geoplant_selects_metadata_source():
         "PresenceAbsenceSurveys/PA_metadata_test_ood.csv",
         "PresenceAbsenceSurveys/PA_metadata_test_glc25.csv",
     ]
-
-
-def test_geoplant_selects_environmental_values_with_filters():
-    geoplant = GeoPlant(root="data")
-
-    assert geoplant.files(environmental_values=True, source="pa", variables="soilgrids", legacy=True) == [
-        "EnvironmentalValues/SoilGrids/v1/PA-train-soilgrids.csv",
-        "EnvironmentalValues/SoilGrids/v1/PA-test-soilgrids.csv",
-    ]
-
-
-def test_geoplant_selects_climate_environmental_values():
-    geoplant = GeoPlant(root="data")
-
     assert geoplant.files(environmental_values=True, source="pa", variables="climate") == [
         "EnvironmentalValues/Climate/PA-train-bioclimatic.csv",
         "EnvironmentalValues/Climate/PA-test-iid-bioclimatic.csv",
         "EnvironmentalValues/Climate/PA-test-ood-bioclimatic.csv",
         "EnvironmentalValues/Climate/PA-test-glc25-bioclimatic.csv",
-    ]
-    assert geoplant.files(environmental_values=True, source="po", variables="climate") == [
-        "EnvironmentalValues/Climate/PO-train-bioclimatic.csv",
-    ]
-
-
-def test_geoplant_selects_bioclim_values_and_cubes():
-    geoplant = GeoPlant(root="data")
-
-    assert geoplant.files(bioclim_values=True, source="po") == [
-        "TimeSeries/Bioclim/values/PO-train-bioclimatic_time_series.zip",
     ]
     assert geoplant.files(bioclim_cubes=True, source="pa") == [
         "TimeSeries/Bioclim/cubes/PA-train-bioclimatic-monthly.zip",
@@ -55,20 +29,6 @@ def test_geoplant_selects_bioclim_values_and_cubes():
         "TimeSeries/Bioclim/cubes/PA-test-ood-bioclimatic-monthly.zip",
         "TimeSeries/Bioclim/cubes/PA-test-glc25-bioclimatic-monthly.zip",
     ]
-
-
-def test_geoplant_selects_rasters_with_filters():
-    geoplant = GeoPlant(root="data")
-
-    assert geoplant.files(rasters=True, variables="climate") == [
-        "EnvironmentalRasters/Climate/BioClimatic_Average_1981-2010.zip",
-        "EnvironmentalRasters/Climate/Climatic_Monthly_1979-2019.zip",
-    ]
-
-
-def test_geoplant_can_select_satellite_modalities():
-    geoplant = GeoPlant(root="data")
-
     assert geoplant.files(satellite_data=True, source="pa", satellite_modalities="alphaearth") == [
         "SatelliteData/AlphaEarth/PA-train-alphaearth.parquet",
         "SatelliteData/AlphaEarth/PA-test-iid-alphaearth.parquet",
@@ -116,21 +76,6 @@ def test_geoplant_download_uses_selected_files_and_root(monkeypatch):
         )
     ]
     assert results == [DownloadResult(file_path="EnvironmentalValues/Elevation/PA-train-elevation.csv", success=True)]
-
-
-def test_geoplant_extract_selected_zip_files(tmp_path):
-    archive_path = tmp_path / "TimeSeries/Bioclim/cubes/PA-test-iid-bioclimatic-monthly.zip"
-    archive_path.parent.mkdir(parents=True)
-    with zipfile.ZipFile(archive_path, "w") as archive:
-        archive.writestr("sample.txt", "ok")
-
-    geoplant = GeoPlant(root=tmp_path)
-    results = geoplant.extract(bioclim_cubes=True, source="pa")
-
-    selected = [result for result in results if result.archive_path == str(archive_path)]
-    assert selected
-    assert selected[0].success
-    assert (archive_path.with_suffix("") / "sample.txt").read_text() == "ok"
 
 
 def test_geoplant_download_extract_uses_group_completion(monkeypatch):

@@ -539,12 +539,12 @@ def collect_requested_file_groups(args: argparse.Namespace) -> FileGroups:
     if args.landsat_values:
         for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
             if source_name in source_names:
-                requested_file_groups.extend(file_groups_for_variable(structure, False, "satellitetimeseries"))
+                requested_file_groups.extend(file_groups_for_variable(structure, False, "landsat"))
 
     if args.landsat_cubes:
         for source_name, structure in (("po", PRESENCE_ONLY), ("pa", PRESENCE_ABSENCE)):
             if source_name in source_names:
-                requested_file_groups.extend(file_groups_for_variable(structure, True, "satellitetimeseries"))
+                requested_file_groups.extend(file_groups_for_variable(structure, True, "landsat"))
 
     if args.satellite_data:
         modalities = selected_satellite_modalities_from_names(
