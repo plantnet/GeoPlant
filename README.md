@@ -10,6 +10,11 @@
 <br><br>
 </div>
 
+> [!NOTE]
+> **What's new in the GeoPlant ecosystem**
+> * **New downloader tool.** Python and CLI access for the newly structured dataset, so you can download only the components you need. See [`dataset/README.md`](dataset/README.md).
+> * **Data refreshed and fixed.** The update adds 30m OpenStreetMap-derived Human Footprint rasters, corrected/re-extracted SoilGrids values, and upgraded Sentinel-2 TIFF patches with RGB+NIR bands.
+> * **New evaluation protocols.** GeoPlant now includes IID, OOD, and GLC25 presence-absence test sets, with leaderboards designed to measure spatial generalization and rare-species performance.
 
 ## 🌿 Welcome to the GeoPlant Dataset Hub! 🌍
 
@@ -19,8 +24,6 @@ It integrates expert-verified species observations with rich environmental predi
 ### ![GeoPlant](assets/imgs/DataComposition-v1.1.png)  
 
 **Figure 1.** *GeoPlant combines 5M Presence-Only and 90k Presence-Absence records with Sentinel-2 imagery, Landsat time series, CHELSA climate, and environmental rasters for 10k+ European plant species.*
-
----
 
 ## 🚀 Quick Start
 
@@ -33,63 +36,7 @@ It integrates expert-verified species observations with rich environmental predi
 
 ## Download
 
-The downloader keeps the published Seafile folder structure under the output directory.
-
-```bash
-uv sync
-uv run geoplant download metadata --data ./data
-```
-
-Download tabular EnvironmentalValues:
-
-```bash
-uv run geoplant download environmental-values --source both --data ./data
-```
-
-Download a subset:
-
-```bash
-uv run geoplant download environmental-values --source pa --variables elevation soilgrids --data ./data
-uv run geoplant download satellite-data --source pa --modalities alphaearth --data ./data
-uv run geoplant download bioclim cubes --source pa --extract --data ./data
-uv run geoplant download landsat values --source po --data ./data
-```
-
-Available categories:
-
-```text
-metadata
-rasters
-environmental-values
-bioclim values
-bioclim cubes
-landsat values
-landsat cubes
-satellite-data
-```
-
-Filters:
-
-```text
---source po|pa|both
---variables elevation humanfootprint landcover soilgrids climate
---modalities alphaearth sentinel2-tiff sentinel2-jpeg
---legacy
---extract
-```
-
-Python API:
-
-```python
-from dataset import GeoPlant
-
-gp = GeoPlant(root="data")
-gp.download_environmental_values(source="pa", variables=["elevation", "soilgrids"])
-gp.download_satellite_data(source="pa", modalities="alphaearth")
-gp.download_bioclim("cubes", source="pa", extract=True)
-```
-
-More examples live in [`dataset/README.md`](dataset/README.md).
+See the downloader guide in [`dataset/README.md`](dataset/README.md).
 
 ---
 
@@ -111,15 +58,10 @@ More examples live in [`dataset/README.md`](dataset/README.md).
 | `dev`                      | Refactoring and better accessibility.                                              |
 | `docs`                     | Sources for the website documentation.                                                        |
 
-```bash
-# Example: switch to a baseline branch
-git fetch origin
-git checkout picekl/xgboost-baselines
-```
 
 ## 📜 Citation
 
-If you use GeoPlant, please cite the NeurIPS proceedings (and optionally the extended arXiv version):
+If you use GeoPlant, please cite the NeurIPS proceedings:
 
 **NeurIPS 2024 (Datasets & Benchmarks Track)**
 ```bibtex
